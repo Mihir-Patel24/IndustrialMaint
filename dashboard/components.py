@@ -36,6 +36,7 @@ def spacer(px: int = 16) -> None:
 
 
 def section_header(title: str, subtitle: str = "") -> None:
+    """Page-level section header with optional subtitle."""
     sub_html = ""
     if subtitle:
         sub_html = f'<div style="font-size:13px;color:#6B7280;margin-top:3px">{subtitle}</div>'
@@ -53,6 +54,29 @@ def section_title(text: str) -> None:
         f'<div style="font-size:11px;font-weight:600;letter-spacing:0.08em;'
         f'text-transform:uppercase;color:#9CA3AF;margin:0 0 14px 0">'
         f'{text}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def cost_impact_card(label: str, value: str, subtitle: str = "",
+                     positive: bool = True) -> None:
+    """Business impact KPI card (green=positive, red=negative)."""
+    col    = "#16A34A" if positive else "#DC2626"
+    bg     = "#F0FDF4" if positive else "#FEF2F2"
+    border = "#BBF7D0" if positive else "#FECACA"
+    arrow  = "▲" if positive else "▼"
+    sub_html = (
+        f'<div style="font-size:11px;color:#6B7280;margin-top:4px">{subtitle}</div>'
+        if subtitle else ""
+    )
+    st.markdown(
+        f'<div style="background:{bg};border:1px solid {border};border-radius:12px;'
+        f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
+        f'<div style="font-size:11px;font-weight:600;letter-spacing:0.07em;'
+        f'text-transform:uppercase;color:#9CA3AF;margin-bottom:10px">{label}</div>'
+        f'<div style="font-size:26px;font-weight:700;color:{col};line-height:1.1">'
+        f'<span style="font-size:14px;margin-right:3px">{arrow}</span>{value}</div>'
+        f'{sub_html}</div>',
         unsafe_allow_html=True,
     )
 

@@ -31,13 +31,20 @@ def _sparkline(data: list, color: str = "#2563EB", height: int = 80) -> go.Figur
     return fig
 
 
+def _hex_to_rgba(hex6: str, alpha: float = 0.08) -> str:
+    """Convert #RRGGBB to rgba(r,g,b,alpha) for Plotly."""
+    h = hex6.lstrip("#")
+    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    return f"rgba({r},{g},{b},{alpha})"
+
+
 def _trend_card(title: str, value: str, data: list, color: str) -> None:
     fig = go.Figure(go.Scatter(
         y=data, mode="lines+markers",
         line=dict(color=color, width=2, shape="spline"),
         marker=dict(size=4, color=color),
         fill="tozeroy",
-        fillcolor=color + "18",
+        fillcolor=_hex_to_rgba(color, 0.08),
     ))
     fig.update_layout(
         height=110, margin=dict(t=0, b=0, l=0, r=0),

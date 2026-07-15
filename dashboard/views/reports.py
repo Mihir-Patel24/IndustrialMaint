@@ -8,7 +8,7 @@ import io, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from api_client import get_model_info
-from components import kpi_card, spacer, status_badge
+from components import kpi_card, spacer, status_badge, section_title
 from auth.auth_service import auth
 try:
     from database.db_client import db
@@ -108,7 +108,7 @@ def render():
     info    = get_model_info()
 
     # ── KPI strip ─────────────────────────────────────────────────
-    st.markdown('<div class="section-title">REPORT SUMMARY</div>', unsafe_allow_html=True)
+    section_title("Report Summary")
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1: kpi_card("Total Predictions", str(max(len(history), 1)), "In session")
     with c2: kpi_card("Model", info.get("model_name", "Gradient Boosting"), color=_BLUE)
@@ -119,7 +119,7 @@ def render():
     spacer(16)
 
     # ── Filters ───────────────────────────────────────────────────
-    st.markdown('<div class="section-title">SEARCH & FILTERS</div>', unsafe_allow_html=True)
+    section_title("Search & Filters")
     search_q = st.text_input("🔍 Search predictions...", placeholder="Machine ID, Status, Failure Type",
                               key="rpt_search", label_visibility="collapsed")
     spacer(8)
@@ -157,11 +157,11 @@ def render():
     col_tbl, col_dl = st.columns([3, 1])
 
     with col_tbl:
-        st.markdown('<div class="section-title">PREDICTION HISTORY</div>', unsafe_allow_html=True)
+        section_title("Prediction History")
         st.dataframe(df, use_container_width=True, hide_index=True, height=320)
 
     with col_dl:
-        st.markdown('<div class="section-title">EXPORT</div>', unsafe_allow_html=True)
+        section_title("Export")
         st.markdown(
             f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:18px 20px">',
             unsafe_allow_html=True,
@@ -227,20 +227,19 @@ def render():
     spacer(16)
 
     # ── Full test-set predictions ─────────────────────────────────
-    if os.path.exists(csv_path if 'csv_path' in dir() else ""):
-        st.markdown('<div class="page-section-title">FULL TEST-SET PREDICTIONS</div>', unsafe_allow_html=True)
-        st.dataframe(pd.read_csv(csv_path), use_container_width=True, hide_index=True, height=280)
+    csv_path = os.path.join(os.path.dirname(__file__), "..", "..", "data", "ai4i2020.csv")
+    if os.path.exists(csv_path):
+        section_title("Full Dataset Preview")
+        st.dataframe(
+            pd.read_csv(csv_path).head(50),
+            use_container_width=True, hide_index=True, height=280,
+        )
 
     spacer(16)
 
     # ── Model info panel ──────────────────────────────────────────
-    st.markdown('<div class="page-section-title">MODEL INFORMATION</div>', unsafe_allow_html=True)
-    st.markdown(
-        f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:18px 20px">'
-        f'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">',
-        unsafe_allow_html=True,
-    )
-    for label, value in [
+    section_title("Model Information")
+    model_items = [
         ("Model Name",    info.get("model_name", "Gradient Boosting")),
         ("Feature Count", str(info.get("feature_count", "56"))),
         ("VB R² Score",   str(info.get("vb_r2", "—"))),
@@ -249,10 +248,17 @@ def render():
         ("RUL MAE",       f"{info.get('rul_mae_min', '—')} min"),
         ("Wear Limit",    f"{info.get('wear_limit_mm', 0.3)} mm"),
         ("Dataset",       "NASA Milling + AI4I 2020"),
-    ]:
-        st.markdown(
-            f'<div><div style="font-size:0.7rem;font-weight:600;color:{_GRAY}">{label}</div>'
-            f'<div style="font-size:0.88rem;font-weight:700;color:{_SLATE};margin-top:2px">{value}</div></div>',
-            unsafe_allow_html=True,
-        )
-    st.markdown("</div></div>", unsafe_allow_html=True)
+    ]
+    rows_html = "".join(
+        f'<div><div style="font-size:11px;font-weight:600;color:{_GRAY};text-transform:uppercase;'
+        f'letter-spacing:0.05em;margin-bottom:3px">{lbl}</div>'
+        f'<div style="font-size:15px;font-weight:700;color:{_SLATE}">{val}</div></div>'
+        for lbl, val in model_items
+    )
+    st.markdown(
+        f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:12px;'
+        f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
+        f'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">'
+        f'{rows_html}</div></div>',
+        unsafe_allow_html=True,
+    )

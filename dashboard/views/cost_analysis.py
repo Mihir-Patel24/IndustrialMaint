@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from components import spacer, cost_impact_card, section_header
+from components import spacer, cost_impact_card, section_header, section_title
 
 
 def render() -> None:
@@ -19,7 +19,7 @@ def render() -> None:
     spacer(4)
 
     # ── Input parameters ──────────────────────────────────────────
-    st.markdown('<div class="section-title">COST PARAMETERS</div>', unsafe_allow_html=True)
+    section_title("Cost Parameters")
     st.markdown(
         '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;'
         'padding:24px 28px;box-shadow:0 1px 3px rgba(0,0,0,0.04);margin-bottom:20px">',
@@ -64,7 +64,7 @@ def render() -> None:
     cost_avoided        = savings * (risk / 100)
 
     # ── KPI Row ───────────────────────────────────────────────────
-    st.markdown('<div class="section-title">ESTIMATED BUSINESS IMPACT</div>', unsafe_allow_html=True)
+    section_title("Estimated Business Impact")
     k1, k2, k3, k4 = st.columns(4)
     with k1:
         cost_impact_card(
@@ -101,7 +101,7 @@ def render() -> None:
     col_bar, col_pie = st.columns([3, 2])
 
     with col_bar:
-        st.markdown('<div class="section-title">COST SCENARIO COMPARISON</div>', unsafe_allow_html=True)
+        section_title("Cost Scenario Comparison")
         fig = go.Figure()
         categories = ["Planned Maintenance", "Unplanned Failure"]
         prod_losses = [planned_prod_loss, unplanned_prod_loss]
@@ -133,7 +133,7 @@ def render() -> None:
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
     with col_pie:
-        st.markdown('<div class="section-title">PLANNED COST BREAKDOWN</div>', unsafe_allow_html=True)
+        section_title("Planned Cost Breakdown")
         labels = ["Production Loss", "Maintenance Labor", "Tool Cost"]
         values = [planned_prod_loss, maint_cost, tool_cost]
         fig2 = go.Figure(go.Pie(
@@ -160,7 +160,7 @@ def render() -> None:
     spacer(16)
 
     # ── ROI + Savings summary ─────────────────────────────────────
-    st.markdown('<div class="section-title">RETURN ON INVESTMENT</div>', unsafe_allow_html=True)
+    section_title("Return on Investment")
     st.markdown(
         f'<div style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8);'
         f'border-radius:14px;padding:24px 28px;color:#fff;">'
@@ -193,8 +193,7 @@ def render() -> None:
     spacer(16)
 
     # ── RUL-based timeline ────────────────────────────────────────
-    st.markdown('<div class="section-title">REMAINING USEFUL LIFE — COST IMPACT TIMELINE</div>',
-                unsafe_allow_html=True)
+    section_title("Remaining Useful Life — Cost Impact Timeline")
     import numpy as np
     rul_points = np.linspace(max(rul, 1), 0, 30)
     cost_grow  = [planned_total * (1 + (1 - r / max(rul, 1)) * 2.5) for r in rul_points]

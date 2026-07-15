@@ -61,25 +61,33 @@ def _result_panel(pred: dict) -> None:
     conf = pred.get("confidence", "—")
     meta = pred.get("metadata") or {}
 
-    st.markdown('<div class="page-section-title">PREDICTION RESULTS</div>', unsafe_allow_html=True)
+    from components import section_title
+    section_title("Prediction Results")
 
-    # ── KPI row ───────────────────────────────────────────────────
-    c1, c2, c3, c4, c5, c6, c7, c8 = st.columns(8)
-    with c1: health_kpi_card("Tool Health", th, f"Wear: {vb:.4f} mm")
+    # ── 4-KPI row (no cramping) ───────────────────────────────────
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: health_kpi_card("Tool Health", th)
     with c2: health_kpi_card("Machine Health", mh)
-    with c3: kpi_card("Remaining Useful Life", f"{rul:.1f}", "minutes")
-    with c4: risk_kpi_card("Failure Probability", fp)
-    with c5: risk_kpi_card("Overall Risk", fr)
-    with c6:
+    with c3: risk_kpi_card("Failure Risk", fr)
+    with c4:
+        conf_val = float(str(conf).replace("%", "").strip() or 0)
+        kpi_card("Model Confidence", f"{conf_val:.1f}%", color=_BLUE)
+
+    spacer(12)
+
+    # ── Secondary metrics row ─────────────────────────────────────
+    d1, d2, d3, d4 = st.columns(4)
+    with d1:
+        kpi_card("Remaining Useful Life", f"{rul:.1f}", unit=" min",
+                 color=_BLUE if rul > 20 else _AMBER if rul > 10 else _RED)
+    with d2:
         pc = _RED if prio == "Immediate" else _AMBER if prio == "High" else _BLUE if prio == "Medium" else _GREEN
         kpi_card("Maintenance Priority", prio, color=pc)
-    with c7:
-        kpi_card("Failure Type", ft if ft else "No Failure", color=_SLATE)
-    with c8:
-        conf_val = float(str(conf).replace("%", "").strip() or 0)
-        kpi_card("Model Confidence", f"{conf_val:.1f}%",
-                 f"Tool: {meta.get('tool_model_confidence',0):.0f}% | PM: {meta.get('pm_model_confidence',0):.0f}%",
-                 color=_BLUE)
+    with d3:
+        kpi_card("Failure Type", (ft if ft else "No Failure"), color=_SLATE)
+    with d4:
+        kpi_card("Tool Wear (VB)", f"{vb:.4f}", unit=" mm",
+                 color=_GREEN if vb < 0.1 else _AMBER if vb < 0.2 else _RED)
 
     spacer(16)
 
@@ -249,7 +257,8 @@ def render():
     pred = st.session_state.prediction
 
     # ── Input source selector ─────────────────────────────────────
-    st.markdown('<div class="page-section-title">INPUT SOURCE</div>', unsafe_allow_html=True)
+    from components import section_title
+    section_title("Input Source")
     source = st.radio(
         "Input Source",
         ["Manual Entry", "CSV Upload"],
@@ -266,8 +275,7 @@ def render():
         return
 
     # ── Sample data presets ───────────────────────────────────────
-    st.markdown('<div class="section-title">QUICK FILL — SELECT SCENARIO</div>',
-                unsafe_allow_html=True)
+    section_title("Quick Fill — Select Scenario")
     sq1, sq2, sq3, sq4 = st.columns(4)
     SAMPLES = {
         "healthy": dict(
@@ -313,7 +321,7 @@ def render():
     spacer(12)
 
     # ── Manual Entry Form ─────────────────────────────────────────
-    st.markdown('<div class="section-title">MACHINE PARAMETERS</div>', unsafe_allow_html=True)
+    section_title("Machine Parameters")
     st.markdown(
         f'<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;'
         f'padding:8px 14px;font-size:0.76rem;color:#1d4ed8;margin-bottom:12px">'
@@ -326,9 +334,9 @@ def render():
 
         with col_a:
             st.markdown(
-                '<div style="font-size:0.72rem;font-weight:700;color:#64748b;'
-                'text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">'
-                '🏭 MACHINE INFORMATION</div>',
+                '<div style="font-size:11px;font-weight:600;color:#9CA3AF;'
+                'text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">'
+                '🏭 Machine Information</div>',
                 unsafe_allow_html=True,
             )
             machine_id   = st.text_input("Machine ID", value=_sample.get("machine_id","CNC-03"), key="p_mid")
@@ -349,9 +357,9 @@ def render():
 
         with col_b:
             st.markdown(
-                '<div style="font-size:0.72rem;font-weight:700;color:#64748b;'
-                'text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">'
-                '⚙️ OPERATING PARAMETERS</div>',
+                '<div style="font-size:11px;font-weight:600;color:#9CA3AF;'
+                'text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">'
+                '⚙️ Operating Parameters</div>',
                 unsafe_allow_html=True,
             )
             cutting_speed = st.number_input("Cutting Speed (m/min)",
@@ -375,9 +383,9 @@ def render():
 
         with col_c:
             st.markdown(
-                '<div style="font-size:0.72rem;font-weight:700;color:#64748b;'
-                'text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">'
-                '🌡️ PROCESS CONDITIONS</div>',
+                '<div style="font-size:11px;font-weight:600;color:#9CA3AF;'
+                'text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">'
+                '🌡️ Process Conditions</div>',
                 unsafe_allow_html=True,
             )
             air_temp      = st.number_input("Air Temperature (K)",
@@ -481,8 +489,7 @@ def render():
     spacer(16)
 
     # ── Decision Fusion Diagram ───────────────────────────────────
-    st.markdown('<div class="section-title">DECISION FUSION PIPELINE</div>',
-                unsafe_allow_html=True)
+    section_title("Decision Fusion Pipeline")
     tp = pred.get("tool_prediction") or {"tool_wear": pred.get("vb",0), "remaining_useful_life": pred.get("rul",0)}
     mp = pred.get("maintenance_prediction") or {"failure_probability": pred.get("failure_probability",0), "failure_type": pred.get("failure_type","—")}
     de = pred.get("decision") or {"overall_risk": pred.get("failure_risk",0), "overall_status": pred.get("machine_status","—"), "maintenance_priority": pred.get("maintenance_priority","—")}
@@ -494,13 +501,12 @@ def render():
     # ── SHAP-style explanation ────────────────────────────────────
     breakdown = pred.get("risk_breakdown") or {}
     if breakdown:
-        st.markdown('<div class="section-title">EXPLAINABLE AI — FEATURE INFLUENCE</div>',
-                    unsafe_allow_html=True)
+        section_title("Explainable AI — Feature Influence")
         shap_panel(breakdown, title="Risk Score — Top Contributing Factors")
 
 
 def _csv_upload_section():
-    st.markdown('<div class="page-section-title">BATCH PREDICTION — CSV UPLOAD</div>', unsafe_allow_html=True)
+    section_title("Batch Prediction — CSV Upload")
     st.markdown(
         f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:20px">'
         f'<div style="font-size:0.82rem;font-weight:700;color:{_SLATE};margin-bottom:8px">Upload CSV File</div>'

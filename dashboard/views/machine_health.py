@@ -1,298 +1,194 @@
 """
-views/machine_health.py — Machine Status & Health Monitoring
+dashboard/views/machine_health.py — Fleet Status & Digital Twin
+Premium cards for each CNC machine component. No blue-block issue.
 """
+from __future__ import annotations
 import streamlit as st
 import plotly.graph_objects as go
-import numpy as np
-import sys, os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from components import (
-    section_header, kpi_card, health_kpi_card, risk_kpi_card,
-    gauge_card, alert_card, recommendation_card, spacer,
-    status_badge, priority_badge, risk_breakdown_bars,
-    digital_twin, shap_panel,
+    section_title, spacer, health_kpi_card, risk_kpi_card,
+    digital_twin, machine_card, alert_card, shap_panel,
 )
 
-_SLATE  = "#1e293b"
-_GRAY   = "#64748b"
-_LGRAY  = "#94a3b8"
-_BORDER = "#e2e8f0"
-_WHITE  = "#ffffff"
-_GREEN  = "#16a34a"
-_AMBER  = "#d97706"
-_RED    = "#dc2626"
-_BLUE   = "#2563eb"
 
-# Demo fleet
-_FLEET = [
-    {"id": "CNC-01", "type": "CNC Milling",  "status": "Healthy",  "th": 88, "mh": 91, "risk": 12, "rul": 68.2},
-    {"id": "CNC-03", "type": "CNC Milling",  "status": "Critical", "th": 38, "mh": 38, "risk": 62, "rul": 35.7},
-    {"id": "CNC-05", "type": "CNC Turning",  "status": "Warning",  "th": 55, "mh": 60, "risk": 38, "rul": 42.1},
-    {"id": "CNC-07", "type": "CNC Grinding", "status": "Warning",  "th": 62, "mh": 65, "risk": 45, "rul": 38.5},
-    {"id": "CNC-09", "type": "CNC Milling",  "status": "Healthy",  "th": 79, "mh": 82, "risk": 18, "rul": 55.0},
-    {"id": "CNC-11", "type": "CNC Turning",  "status": "Healthy",  "th": 93, "mh": 95, "risk": 8,  "rul": 72.3},
-]
-
-
-def _sensor_chart(label: str, values: list, color: str, unit: str = "") -> go.Figure:
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=list(range(len(values))), y=values,
-        mode="lines", line=dict(color=color, width=1.5),
-        hovertemplate=f"{label}: %{{y:.3f}}{unit}<extra></extra>",
+def _gauge(value: float, title: str, invert: bool = False, h: int = 200) -> go.Figure:
+    col = (
+        "#DC2626" if (invert and value >= 60) or (not invert and value < 40) else
+        "#F59E0B" if (invert and value >= 35) or (not invert and value < 70) else
+        "#16A34A"
+    )
+    fig = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=value,
+        number={"suffix": "%", "font": {"size": 26, "family": "Inter", "color": "#111827"}},
+        gauge={
+            "axis":  {"range": [0, 100], "tickwidth": 1, "tickcolor": "#E5E7EB",
+                      "tickfont": {"size": 10, "color": "#9CA3AF"}},
+            "bar":   {"color": col, "thickness": 0.22},
+            "bgcolor": "white", "bordercolor": "#E5E7EB", "borderwidth": 1,
+            "steps": [
+                {"range": [0, 40],  "color": "#FEF2F2"},
+                {"range": [40, 70], "color": "#FFFBEB"},
+                {"range": [70, 100],"color": "#F0FDF4"},
+            ] if not invert else [
+                {"range": [0, 35],  "color": "#F0FDF4"},
+                {"range": [35, 60], "color": "#FFFBEB"},
+                {"range": [60, 100],"color": "#FEF2F2"},
+            ],
+        },
+        title={"text": title, "font": {"size": 11, "color": "#6B7280", "family": "Inter"}},
     ))
     fig.update_layout(
-        height=100, margin=dict(t=4, b=4, l=4, r=4),
-        paper_bgcolor=_WHITE, plot_bgcolor=_WHITE,
-        xaxis=dict(showgrid=False, showticklabels=False, zeroline=False),
-        yaxis=dict(showgrid=True, gridcolor="#f1f5f9", showticklabels=False, zeroline=False),
-        showlegend=False,
+        height=h, margin=dict(t=28, b=8, l=16, r=16),
+        paper_bgcolor="white", plot_bgcolor="white",
+        font={"family": "Inter"},
     )
     return fig
 
 
-def render():
-    pred   = st.session_state.prediction
-    alerts = st.session_state.alerts
+def render() -> None:
+    pred       = st.session_state.prediction
+    tool_pred  = pred.get("tool_prediction") or {}
+    maint_pred = pred.get("maintenance_prediction") or {}
+    decision   = pred.get("decision") or {}
+    alerts     = st.session_state.alerts
 
-    # ── Machine selector ──────────────────────────────────────────
-    st.markdown('<div class="section-title">SELECT MACHINE</div>', unsafe_allow_html=True)
-    machine_ids = [m["id"] for m in _FLEET]
-    sel_id = st.selectbox("Machine ID", machine_ids, label_visibility="collapsed", key="mh_sel")
-    sel = next((m for m in _FLEET if m["id"] == sel_id), _FLEET[0])
+    tool_health  = float(tool_pred.get("tool_health",             37.9) or 37.9)
+    mach_health  = float(maint_pred.get("machine_health",         38.0) or 38.0)
+    fail_prob    = float(maint_pred.get("failure_probability",    62.0) or 62.0)
+    rul          = float(tool_pred.get("remaining_useful_life",   35.7) or 35.7)
+    status       = str(decision.get("overall_status",           "Critical"))
+    priority     = str(decision.get("maintenance_priority",     "Immediate"))
+    failure_type = str(maint_pred.get("failure_type",           "Wear Failure"))
+    breakdown    = decision.get("risk_breakdown") or {}
+    machine_id   = st.session_state.last_operator_input.get("machine_id", "CNC-03")
 
-    # Override with live prediction for CNC-03 (the active machine)
-    if sel_id == "CNC-03":
-        sel = {**sel,
-               "th": pred["tool_health"],
-               "mh": pred.get("machine_health", pred["tool_health"]),
-               "risk": pred["failure_risk"],
-               "rul": pred["rul"],
-               "status": pred["machine_status"]}
+    # ── Top KPI Row ───────────────────────────────────────────────
+    spacer(8)
+    section_title("Fleet Status Overview")
+    c1, c2, c3, c4 = st.columns(4)
+    with c1: health_kpi_card("Machine Health",  mach_health)
+    with c2: health_kpi_card("Tool Health",     tool_health)
+    with c3: risk_kpi_card("Failure Risk",       fail_prob)
+    with c4:
+        rul_col = "#2563EB" if rul > 20 else "#F59E0B" if rul > 10 else "#DC2626"
+        from components import kpi_card
+        kpi_card("Remaining Useful Life", f"{rul:.1f}", unit=" min", color=rul_col)
 
-    spacer(12)
+    spacer(32)
 
-    # ── Machine identity card ─────────────────────────────────────
-    bg, col = ("#fee2e2", _RED) if sel["status"] == "Critical" else \
-              ("#fef3c7", _AMBER) if sel["status"] == "Warning" else \
-              ("#dcfce7", _GREEN)
-    st.markdown(
-        f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;'
-        f'padding:18px 22px;margin-bottom:16px">'
-        f'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
-        f'<div>'
-        f'<div style="font-size:1.2rem;font-weight:800;color:{_SLATE}">{sel["id"]}</div>'
-        f'<div style="font-size:0.8rem;color:{_GRAY};margin-top:2px">{sel["type"]} — Active</div>'
-        f'</div>'
-        f'<div style="text-align:right">'
-        f'{status_badge(sel["status"], "lg")}'
-        f'<div style="font-size:0.72rem;color:{_LGRAY};margin-top:4px">Last updated: just now</div>'
-        f'</div></div></div>',
-        unsafe_allow_html=True,
-    )
+    # ── Left: Gauges | Right: Alerts ─────────────────────────────
+    col_g, col_a = st.columns([3, 2])
 
-    # ── ROW 1: Health KPIs ────────────────────────────────────────
-    st.markdown('<div class="section-title">MACHINE HEALTH OVERVIEW</div>', unsafe_allow_html=True)
-    c1, c2, c3, c4, c5, c6, c7 = st.columns(7)
-
-    with c1: health_kpi_card("Tool Health", sel["th"])
-    with c2: health_kpi_card("Machine Health", sel["mh"])
-    with c3: kpi_card("Remaining Useful Life", f"{sel['rul']:.1f}", "minutes")
-    with c4: risk_kpi_card("Failure Probability", pred.get("failure_probability", sel["risk"]))
-    with c5: risk_kpi_card("Overall Risk", sel["risk"])
-    with c6:
-        prio = pred.get("maintenance_priority", "Low")
-        pc = _RED if prio == "Immediate" else _AMBER if prio == "High" else _BLUE if prio == "Medium" else _GREEN
-        kpi_card("Maintenance Priority", prio, color=pc)
-    with c7:
-        ft = pred.get("failure_type", "No Failure")
-        kpi_card("Failure Type", ft if ft else "No Failure", color=_SLATE)
-
-    spacer(16)
-
-    # ── DIGITAL TWIN VISUALIZATION ──────────────────────────────
-    st.markdown('<div class="section-title">DIGITAL TWIN — COMPONENT STATUS</div>',
-                unsafe_allow_html=True)
-    th  = sel["th"]
-    mh  = sel["mh"]
-    rk  = sel["risk"]
-
-    def _twin_status(health: float) -> str:
-        if health >= 70: return "healthy"
-        if health >= 40: return "warning"
-        return "critical"
-
-    twin_components = {
-        "Motor":   (_twin_status(mh),     mh),
-        "Tool":    (_twin_status(th),     th),
-        "Spindle": (_twin_status(min(th + 10, 100)), min(th + 10, 100)),
-        "Cooling": (_twin_status(max(mh - 5, 0)),   max(mh - 5, 0)),
-        "Power":   (_twin_status(max(100 - rk, 0)), max(100 - rk, 0)),
-    }
-    digital_twin(twin_components)
-
-    spacer(16)
-
-    # ── ROW 2: Gauges + Operator Summary ─────────────────────────
-    col_g1, col_g2, col_g3, col_summary = st.columns([1, 1, 1, 2])
-
-    with col_g1:
-        st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:12px 14px">'
-            f'<div style="font-size:0.78rem;font-weight:700;color:{_SLATE};margin-bottom:4px">Tool Health</div>',
-            unsafe_allow_html=True,
-        )
-        gauge_card(sel["th"], "Tool Health %", invert=False)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with col_g2:
-        st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:12px 14px">'
-            f'<div style="font-size:0.78rem;font-weight:700;color:{_SLATE};margin-bottom:4px">Machine Health</div>',
-            unsafe_allow_html=True,
-        )
-        gauge_card(sel["mh"], "Machine Health %", invert=False)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with col_g3:
-        st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:12px 14px">'
-            f'<div style="font-size:0.78rem;font-weight:700;color:{_SLATE};margin-bottom:4px">Failure Risk</div>',
-            unsafe_allow_html=True,
-        )
-        gauge_card(sel["risk"], "Failure Risk %", invert=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with col_summary:
-        summary = pred.get("operator_summary", "")
-        actions = pred.get("recommended_actions") or []
-        components = pred.get("recommended_components") or []
-        sched = pred.get("maintenance_schedule", pred.get("next_maintenance", "—"))
-        prio  = pred.get("maintenance_priority", "Low")
-        prio_bg = {"Immediate": "#fee2e2", "High": "#fef3c7", "Medium": "#eff6ff"}.get(prio, "#f0fdf4")
-        prio_col = {"Immediate": _RED, "High": _AMBER, "Medium": _BLUE}.get(prio, _GREEN)
-
-        st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:18px 20px;height:100%">'
-            f'<div style="font-size:0.88rem;font-weight:700;color:{_SLATE};margin-bottom:10px">Operator Summary</div>'
-            f'<div style="background:{prio_bg};border-radius:6px;padding:10px 14px;margin-bottom:12px">'
-            f'<div style="font-size:0.72rem;font-weight:700;color:{prio_col};margin-bottom:3px">MAINTENANCE PRIORITY: {prio.upper()}</div>'
-            f'<div style="font-size:0.8rem;color:{_SLATE}">{summary or "No issues detected."}</div>'
-            f'</div>'
-            f'<div style="font-size:0.74rem;font-weight:600;color:{_GRAY};margin-bottom:6px">RECOMMENDED ACTIONS</div>',
-            unsafe_allow_html=True,
-        )
-        for act in (actions[:3] if actions else ["Continue normal operation"]):
+    with col_g:
+        section_title("Health Gauges")
+        g1, g2, g3 = st.columns(3)
+        with g1:
             st.markdown(
-                f'<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:5px">'
-                f'<span style="color:{_BLUE};font-size:0.7rem;margin-top:2px">&#9654;</span>'
-                f'<span style="font-size:0.78rem;color:{_SLATE}">{act}</span>'
-                f'</div>',
+                '<div style="background:#FFFFFF;border:1px solid #E5E7EB;'
+                'border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">',
                 unsafe_allow_html=True,
             )
-        if components:
+            fig = _gauge(mach_health, "Machine Health")
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+            st.markdown("</div>", unsafe_allow_html=True)
+        with g2:
             st.markdown(
-                f'<div style="font-size:0.74rem;font-weight:600;color:{_GRAY};margin:8px 0 4px 0">COMPONENTS TO INSPECT</div>',
+                '<div style="background:#FFFFFF;border:1px solid #E5E7EB;'
+                'border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">',
                 unsafe_allow_html=True,
             )
+            fig = _gauge(tool_health, "Tool Health")
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+            st.markdown("</div>", unsafe_allow_html=True)
+        with g3:
             st.markdown(
-                f'<div style="font-size:0.78rem;color:{_SLATE}">{" · ".join(components)}</div>',
+                '<div style="background:#FFFFFF;border:1px solid #E5E7EB;'
+                'border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">',
                 unsafe_allow_html=True,
             )
-        st.markdown(
-            f'<div style="font-size:0.74rem;color:{_LGRAY};margin-top:8px">Schedule: {sched}</div>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-
-    spacer(16)
-
-    # ── ROW 3: Sensor Charts ──────────────────────────────────────
-    st.markdown('<div class="page-section-title">SENSOR READINGS</div>', unsafe_allow_html=True)
-
-    np.random.seed(42)
-    n = 30
-    sensors = [
-        ("Spindle AC Current",  np.random.normal(-0.165, 0.12, n), _BLUE,   "A"),
-        ("Spindle DC Current",  np.random.normal(6.2,   0.3,  n), "#8b5cf6", "A"),
-        ("Table Vibration",     np.random.normal(0.92,  0.08, n), _AMBER,  "g"),
-        ("Spindle Vibration",   np.random.normal(0.40,  0.05, n), "#06b6d4", "g"),
-        ("AE Table",            np.random.normal(0.22,  0.02, n), _GREEN,  "V"),
-        ("AE Spindle",          np.random.normal(0.31,  0.03, n), _RED,    "V"),
-    ]
-    sc1, sc2, sc3 = st.columns(3)
-    cols = [sc1, sc2, sc3, sc1, sc2, sc3]
-    for i, (name, vals, color, unit) in enumerate(sensors):
-        with cols[i]:
-            st.markdown(
-                f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:12px 14px;margin-bottom:10px">'
-                f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
-                f'<span style="font-size:0.76rem;font-weight:600;color:{_SLATE}">{name}</span>'
-                f'<span style="font-size:0.76rem;font-weight:700;color:{color}">{vals[-1]:.3f} {unit}</span>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-            st.plotly_chart(_sensor_chart(name, list(vals), color, unit),
-                            use_container_width=True, config={"displayModeBar": False})
+            fig = _gauge(fail_prob, "Failure Risk", invert=True)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
 
-    spacer(16)
-
-    # ── ROW 4: Risk Breakdown + Fleet Overview ────────────────────
-    col_rb, col_fleet = st.columns([2, 3])
-
-    with col_rb:
-        st.markdown('<div class="page-section-title">RISK BREAKDOWN</div>', unsafe_allow_html=True)
-        st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:18px 20px">',
-            unsafe_allow_html=True,
-        )
-        breakdown = pred.get("risk_breakdown") or {}
-        if breakdown:
-            risk_breakdown_bars(breakdown)
-        else:
-            st.markdown(f'<div style="font-size:0.8rem;color:{_LGRAY}">No breakdown available.</div>',
-                        unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    with col_fleet:
-        st.markdown('<div class="page-section-title">FLEET STATUS</div>', unsafe_allow_html=True)
-        st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:8px;padding:0">'
-            f'<table style="width:100%;border-collapse:collapse;font-size:0.78rem">'
-            f'<thead><tr style="border-bottom:1px solid {_BORDER}">'
-            f'<th style="padding:10px 14px;text-align:left;color:{_GRAY};font-weight:600;font-size:0.7rem">MACHINE</th>'
-            f'<th style="padding:10px 14px;text-align:left;color:{_GRAY};font-weight:600;font-size:0.7rem">TYPE</th>'
-            f'<th style="padding:10px 14px;text-align:left;color:{_GRAY};font-weight:600;font-size:0.7rem">STATUS</th>'
-            f'<th style="padding:10px 14px;text-align:left;color:{_GRAY};font-weight:600;font-size:0.7rem">TOOL HEALTH</th>'
-            f'<th style="padding:10px 14px;text-align:left;color:{_GRAY};font-weight:600;font-size:0.7rem">RISK</th>'
-            f'<th style="padding:10px 14px;text-align:left;color:{_GRAY};font-weight:600;font-size:0.7rem">RUL</th>'
-            f'</tr></thead><tbody>',
-            unsafe_allow_html=True,
-        )
-        for m in _FLEET:
-            th_c = _GREEN if m["th"] >= 70 else _AMBER if m["th"] >= 40 else _RED
-            rk_c = _RED if m["risk"] >= 60 else _AMBER if m["risk"] >= 30 else _GREEN
-            row_bg = "#fff5f5" if m["status"] == "Critical" else "#fffbeb" if m["status"] == "Warning" else _WHITE
-            st.markdown(
-                f'<tr style="border-bottom:1px solid {_BORDER};background:{row_bg}">'
-                f'<td style="padding:9px 14px;font-weight:600;color:{_SLATE}">{m["id"]}</td>'
-                f'<td style="padding:9px 14px;color:{_GRAY};font-size:0.74rem">{m["type"]}</td>'
-                f'<td style="padding:9px 14px">{status_badge(m["status"])}</td>'
-                f'<td style="padding:9px 14px;font-weight:700;color:{th_c}">{m["th"]}%</td>'
-                f'<td style="padding:9px 14px;font-weight:700;color:{rk_c}">{m["risk"]}%</td>'
-                f'<td style="padding:9px 14px;color:{_SLATE}">{m["rul"]:.1f} min</td>'
-                f'</tr>',
-                unsafe_allow_html=True,
+    with col_a:
+        section_title("Active Alerts")
+        for alert in alerts[:4]:
+            alert_card(
+                title    = alert.get("title", "Alert"),
+                detail   = alert.get("detail", ""),
+                time_str = alert.get("time", ""),
+                level    = alert.get("level", "info"),
             )
-        st.markdown("</tbody></table></div>", unsafe_allow_html=True)
+        if not alerts:
+            st.info("No active alerts.")
 
-    spacer(16)
+    spacer(32)
 
-    # ── Alerts for selected machine ───────────────────────────────
-    machine_alerts = [a for a in alerts if sel_id in a.get("detail", "")]
-    if machine_alerts:
-        st.markdown('<div class="page-section-title">MACHINE ALERTS</div>', unsafe_allow_html=True)
-        for a in machine_alerts:
-            alert_card(a["title"], a["detail"], a["time"], a.get("level", "info"))
+    # ── Digital Twin ──────────────────────────────────────────────
+    section_title(f"Digital Twin — Machine {machine_id}")
+
+    def _comp_status(h: float) -> str:
+        return "Healthy" if h >= 70 else "Warning" if h >= 40 else "Critical"
+
+    components = {
+        "Motor":   (_comp_status(mach_health),      mach_health),
+        "Tool":    (_comp_status(tool_health),       tool_health),
+        "Spindle": (_comp_status(max(30, tool_health - 5)), max(30, tool_health - 5)),
+        "Cooling": (_comp_status(min(85, mach_health + 15)), min(85, mach_health + 15)),
+        "Power":   (_comp_status(min(90, mach_health + 20)), min(90, mach_health + 20)),
+    }
+    digital_twin(components)
+
+    spacer(32)
+
+    # ── Machine List + SHAP Panel ─────────────────────────────────
+    col_m, col_s = st.columns([2, 3])
+
+    with col_m:
+        section_title("Fleet Overview")
+        machines = [
+            (machine_id, status, tool_health, mach_health, fail_prob),
+            ("CNC-01", "Healthy", 88.0, 91.0, 12.0),
+            ("CNC-07", "Warning", 52.0, 58.0, 41.0),
+            ("CNC-12", "Healthy", 79.0, 83.0, 18.0),
+        ]
+        for mid, stat, th, mh, rk in machines:
+            machine_card(
+                machine_id     = mid,
+                status         = stat,
+                tool_health    = th,
+                machine_health = mh,
+                risk           = rk,
+                last_pred      = "14 Jul 2026, 15:39" if mid == machine_id else "",
+            )
+
+    with col_s:
+        section_title("AI Feature Influence (SHAP-style)")
+        if breakdown:
+            shap_panel(breakdown, f"Risk Factors — {machine_id}")
+        else:
+            st.info("Run a prediction to see feature influence analysis.")
+
+        spacer(16)
+        section_title("Prediction Details")
+        detail_rows = [
+            ("Failure Type",     failure_type),
+            ("Priority",         priority),
+            ("Overall Status",   status),
+            ("Tool Wear (VB)",   f"{float(tool_pred.get('tool_wear',0.186) or 0.186):.4f} mm"),
+            ("Machine Failure",  str(maint_pred.get("machine_failure", "Yes"))),
+        ]
+        rows_html = "".join(
+            f'<div style="display:flex;justify-content:space-between;'
+            f'padding:8px 0;border-bottom:1px solid #F3F4F6">'
+            f'<span style="font-size:12px;color:#6B7280">{label}</span>'
+            f'<span style="font-size:12px;font-weight:600;color:#111827">{val}</span>'
+            f'</div>'
+            for label, val in detail_rows
+        )
+        st.markdown(
+            f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+            f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">{rows_html}</div>',
+            unsafe_allow_html=True,
+        )
