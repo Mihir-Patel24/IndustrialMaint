@@ -102,6 +102,19 @@ This project implements a **Hybrid AI-Based Predictive Maintenance Framework** t
 - Cost & ROI calculator
 - Maintenance Gantt timeline
 
+### 📊 Reports & Analytics (Phase 4)
+| Feature | Notes |
+|---|---|
+| DB-backed history | Persistent across sessions — up to 200 predictions pulled from DB |
+| Risk trend chart | Line chart with 60% alert threshold |
+| Health trend chart | Tool vs Machine Health over time |
+| Status distribution | Donut chart — Critical / Warning / Healthy |
+| Failure type breakdown | Bar chart per failure mode |
+| Batch CSV export | All DB predictions in one download |
+| Scheduled report | Weekly / Monthly / All-Time summary PDF — role-guarded |
+| PDF report | Per-prediction report with operator, company, risk breakdown |
+| RBAC-guarded export | Only Admin & Plant Manager can export PDF / schedule reports |
+
 ### 🗂 Machine Registry (Phase 3)
 | Feature | Notes |
 |---|---|
