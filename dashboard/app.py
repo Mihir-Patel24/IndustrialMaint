@@ -172,14 +172,15 @@ api_lbl = "API Online" if api_ok else "Local Mode"
 
 # ── ROUTING PAGES ─────────────────────────────────────────────────
 PAGES_ALL = [
-    ("Dashboard",      "📊", "OVERVIEW"),
-    ("Machine Health", "🏭", "OVERVIEW"),
-    ("Predictions",    "🔮", "ANALYSIS"),
-    ("Maintenance",    "🔧", "OPERATIONS"),
-    ("Reports",        "📋", "OPERATIONS"),
-    ("Cost Analysis",  "💰", "OPERATIONS"),
-    ("Profile",        "👤", "ACCOUNT"),
-    ("Settings",       "⚙️",  "ACCOUNT"),
+    ("Dashboard",        "📊", "OVERVIEW"),
+    ("Machine Health",   "🏭", "OVERVIEW"),
+    ("Predictions",      "🔮", "ANALYSIS"),
+    ("Machine Registry", "🗂", "ANALYSIS"),
+    ("Maintenance",      "🔧", "OPERATIONS"),
+    ("Reports",          "📋", "OPERATIONS"),
+    ("Cost Analysis",    "💰", "OPERATIONS"),
+    ("Profile",          "👤", "ACCOUNT"),
+    ("Settings",         "⚙️",  "ACCOUNT"),
 ]
 
 # ── AUTH GATE ─────────────────────────────────────────────────────
@@ -268,6 +269,29 @@ with st.sidebar:
     # Spacer to push user to bottom
     st.markdown('<div style="flex:1;min-height:40px"></div>', unsafe_allow_html=True)
 
+    # DB health pill
+    try:
+        from database.db_client import db as _db
+        _uid   = auth.user_id()
+        _stats = _db.get_db_stats(_uid) if _uid else {}
+        _mode  = _stats.get("db_mode", "SQLite")
+        _pc    = _stats.get("predictions", 0)
+        _mc    = _stats.get("machines", 0)
+        _dot   = "#16A34A" if _mode == "Supabase" else "#2563EB"
+        st.markdown(
+            f'<div style="margin:0 8px 10px;background:rgba(37,99,235,0.07);'
+            f'border:1px solid rgba(37,99,235,0.18);border-radius:8px;'
+            f'padding:8px 12px;font-size:11px;color:#64748B">'
+            f'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;'
+            f'background:{_dot};margin-right:5px"></span>'
+            f'<b style="color:#374151">{_mode}</b>'
+            f' &nbsp;·&nbsp; {_pc} preds &nbsp;·&nbsp; {_mc} machines'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+    except Exception:
+        pass
+
     # User profile at bottom
     st.markdown(
         f'<div class="sb-user">'
@@ -340,6 +364,8 @@ elif p == "Machine Health":
     from views import machine_health; machine_health.render()
 elif p == "Predictions":
     from views import predictions; predictions.render()
+elif p == "Machine Registry":
+    from views import machine_registry; machine_registry.render()
 elif p == "Maintenance":
     from views import maintenance; maintenance.render()
 elif p == "Reports":
