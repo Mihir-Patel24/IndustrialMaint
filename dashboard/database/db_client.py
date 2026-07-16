@@ -368,6 +368,41 @@ class DatabaseClient:
         conn.close()
         return _rows_to_list(rows)
 
+    def update_machine_status(self, machine_id: str, status: str) -> None:
+        """Update the status field of a machine record by machine_id."""
+        if _supabase:
+            _supabase.table("machines").update({"status": status}).eq("machine_id", machine_id).execute()
+            return
+        conn = _get_conn()
+        conn.execute("UPDATE machines SET status=? WHERE machine_id=?", (status, machine_id))
+        conn.commit()
+        conn.close()
+
+    def update_machine(self, record_id: str, **kwargs: Any) -> None:
+        """Update editable fields of a machine by its primary key (id)."""
+        allowed = {"machine_name", "machine_type", "material", "factory", "location", "status"}
+        data = {k: v for k, v in kwargs.items() if k in allowed}
+        if not data:
+            return
+        if _supabase:
+            _supabase.table("machines").update(data).eq("id", record_id).execute()
+            return
+        conn = _get_conn()
+        sets = ", ".join(f"{k}=?" for k in data)
+        conn.execute(f"UPDATE machines SET {sets} WHERE id=?", (*data.values(), record_id))
+        conn.commit()
+        conn.close()
+
+    def delete_machine(self, record_id: str) -> None:
+        """Delete a machine record by its primary key (id)."""
+        if _supabase:
+            _supabase.table("machines").delete().eq("id", record_id).execute()
+            return
+        conn = _get_conn()
+        conn.execute("DELETE FROM machines WHERE id=?", (record_id,))
+        conn.commit()
+        conn.close()
+
     # ── Alerts ────────────────────────────────────────────────────
 
     def save_alert(self, user_id: str, title: str, detail: str,
@@ -403,6 +438,36 @@ class DatabaseClient:
         ).fetchall()
         conn.close()
         return _rows_to_list(rows)
+
+    def get_alert_counts(self, user_id: str) -> dict:
+        """Return {total, unread, critical, warning, info} counts for a user."""
+        alerts = self.get_user_alerts(user_id, limit=200)
+        return {
+            "total":    len(alerts),
+            "unread":   sum(1 for a in alerts if not a.get("is_read")),
+            "critical": sum(1 for a in alerts if a.get("level") == "critical"),
+            "warning":  sum(1 for a in alerts if a.get("level") == "warning"),
+            "info":     sum(1 for a in alerts if a.get("level") == "info"),
+        }
+
+    def mark_alerts_read(self, user_id: str) -> None:
+        """Mark all alerts for a user as read."""
+        if _supabase:
+            _supabase.table("alerts").update({"is_read": 1}).eq("user_id", user_id).execute()
+            return
+        conn = _get_conn()
+        conn.execute("UPDATE alerts SET is_read=1 WHERE user_id=?", (user_id,))
+        conn.commit()
+        conn.close()
+
+    def get_db_stats(self, user_id: str) -> dict:
+        """Return row counts for dashboard DB health indicator."""
+        return {
+            "predictions":  self.get_prediction_count(user_id),
+            "machines":     len(self.get_user_machines(user_id)),
+            "alerts":       self.get_alert_counts(user_id)["total"],
+            "db_mode":      "Supabase" if _supabase else "SQLite",
+        }
 
     def log_audit(self, user_id: str, action: str, detail: str = "") -> None:
         row = {
