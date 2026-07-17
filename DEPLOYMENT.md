@@ -24,7 +24,7 @@ Streamlit Community Cloud provides a seamless, auto-updating deployment link con
 SUPABASE_URL = "https://your-project.supabase.co"
 SUPABASE_ANON_KEY = "your-supabase-anon-key-here"
 SECRET_KEY = "your-randomly-generated-secret-string"
-DEMO_MODE = "true"
+DEMO_MODE = "false"
 ```
 5. Click **Deploy!**
 
