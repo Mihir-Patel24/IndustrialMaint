@@ -67,8 +67,7 @@ def render():
     with c2:
         n_crit = sum(1 for t in _UPCOMING if t["priority"] == "Immediate")
         kpi_card("Critical Tasks", str(n_crit), "Require immediate action",
-                 color=_RED if n_crit else _SLATE,
-                 border_color="#fecaca" if n_crit else _BORDER)
+                 color=_RED if n_crit else _SLATE)
     with c3:
         kpi_card("Completed (30d)", str(len(_COMPLETED)), "Tasks completed", color=_GREEN)
     with c4:

@@ -59,19 +59,43 @@ def predict_single(
     """
     model = _load_model()
 
-    features = np.array([[
-        smcAC_mean, smcAC_rms, smcAC_std,
-        smcDC_mean, smcDC_rms, smcDC_std,
-        vib_table_mean, vib_table_rms,
-        vib_spindle_mean, vib_spindle_rms,
-        AE_table_mean, AE_table_rms,
-        AE_spindle_mean, AE_spindle_rms,
-        time, DOC, feed, material,
-        VB_lag1, VB_lag2, run_norm,
-    ]])
+    # Derive missing statistical proxy features for the 56-feature array
+    def _expand(mean, rms, std):
+        return [
+            mean, std, rms,
+            rms * 1.5,     # max proxy
+            mean * 0.5,    # min proxy
+            std ** 2,      # var proxy
+            0.0,           # skew proxy
+            3.0,           # kurtosis proxy (normal dist)
+        ]
+
+    f_smcAC = _expand(smcAC_mean, smcAC_rms, smcAC_std)
+    f_smcDC = _expand(smcDC_mean, smcDC_rms, smcDC_std)
+    f_vibT  = _expand(vib_table_mean, vib_table_rms, vib_table_mean * 0.1) # approximate std
+    f_vibS  = _expand(vib_spindle_mean, vib_spindle_rms, vib_spindle_mean * 0.1)
+    f_aeT   = _expand(AE_table_mean, AE_table_rms, AE_table_mean * 0.1)
+    f_aeS   = _expand(AE_spindle_mean, AE_spindle_rms, AE_spindle_mean * 0.1)
+
+    f_base = f_smcAC + f_smcDC + f_vibT + f_vibS + f_aeT + f_aeS
+    
+    features = np.array([
+        f_base + [
+            time, DOC, feed, material,
+            run_norm, VB_lag1, VB_lag2, max(0, VB_lag1 - VB_lag2)
+        ]
+    ])
+
+    if isinstance(model, dict):
+        scaler = model.get("scaler")
+        actual_model = model.get("vb_model") or model.get("model")
+        if scaler:
+            features = scaler.transform(features)
+    else:
+        actual_model = model
 
     # Model predicts VB (tool flank wear in mm)
-    vb_predicted = float(model.predict(features)[0])
+    vb_predicted = float(actual_model.predict(features)[0])
     vb_predicted = max(0.0, vb_predicted)
 
     # Derive RUL from VB

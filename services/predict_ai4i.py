@@ -57,25 +57,45 @@ def predict(
     """
     model = _load_model()
 
-    mtype_enc = MACHINE_TYPE_ENC.get(str(machine_type).upper(), 1)
+    m_type_char = str(machine_type).upper()
+    is_m = 1.0 if m_type_char == "M" else 0.0
+    is_l = 1.0 if m_type_char == "L" else 0.0
+    is_h = 1.0 if m_type_char == "H" else 0.0
+
+    # Failure type — heuristic from operating conditions
+    temp_diff  = float(proc_temp) - float(air_temp)
+    power      = float(rpm) * float(torque) * 2 * 3.14159 / 60.0
+    torque_wear= float(torque) * float(tool_wear) / 1000.0
 
     features = np.array([[
+        is_m,
+        is_l,
+        is_h,
         float(air_temp),
         float(proc_temp),
         float(rpm),
         float(torque),
         float(tool_wear),
-        mtype_enc,
+        power,
+        temp_diff,
+        torque_wear
     ]])
 
-    # Predict failure probability
     try:
-        proba = model.predict_proba(features)[0]
+        if isinstance(model, dict):
+            scaler = model.get("scaler")
+            actual_model = model.get("failure_model") or model.get("model")
+            if scaler:
+                features = scaler.transform(features)
+        else:
+            actual_model = model
+
+        proba = actual_model.predict_proba(features)[0]
         # proba[1] = failure probability
         failure_prob_raw = float(proba[1]) if len(proba) > 1 else float(proba[0])
     except AttributeError:
         # Hard classifier fallback
-        pred_class = int(model.predict(features)[0])
+        pred_class = int(actual_model.predict(features)[0])
         failure_prob_raw = 0.85 if pred_class == 1 else 0.10
 
     failure_prob_pct = round(failure_prob_raw * 100.0, 1)
