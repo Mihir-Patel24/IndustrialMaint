@@ -1,0 +1,11 @@
+Torque_Wear
+Power
+Rotational speed [rpm]
+Torque [Nm]
+Heat_Index
+Temp_Difference
+Tool wear [min]
+Type_L
+Type_M
+Air temperature [K]
+Process temperature [K]
