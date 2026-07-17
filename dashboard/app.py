@@ -253,7 +253,7 @@ with st.sidebar:
         is_active = st.session_state.page == name_pg
         btn_type  = "primary" if is_active else "secondary"
         if st.button(f"{icon}  {name_pg}", key=f"nav_{name_pg}",
-                     use_container_width=True, type=btn_type):
+                     width='stretch', type=btn_type):
             st.session_state.page = name_pg
             st.rerun()
 
@@ -278,7 +278,7 @@ with st.sidebar:
         _badge_label = (f"{_critical_db} Critical" if _critical_db
                         else f"{_unread} Unread")
         if st.button(f"🔔 {_badge_label}", key="nav_alert_badge",
-                     use_container_width=True, type="secondary"):
+                     width='stretch', type="secondary"):
             st.session_state.page = "Alert Centre"
             st.rerun()
 
@@ -319,7 +319,7 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
 
-    if st.button("🚪  Logout", key="nav_logout", use_container_width=True):
+    if st.button("🚪  Logout", key="nav_logout", width='stretch'):
         auth.logout()
         st.session_state.auth_page = "login"
         st.rerun()

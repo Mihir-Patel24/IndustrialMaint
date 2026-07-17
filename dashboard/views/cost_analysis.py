@@ -21,7 +21,7 @@ def render() -> None:
     # ── Input parameters ──────────────────────────────────────────
     section_title("Cost Parameters")
     st.markdown(
-        '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;'
+        '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;'
         'padding:24px 28px;box-shadow:0 1px 3px rgba(0,0,0,0.04);margin-bottom:20px">',
         unsafe_allow_html=True,
     )
@@ -112,7 +112,7 @@ def render() -> None:
                              marker_color="#bfdbfe", text=[f"${v:,.0f}" for v in prod_losses],
                              textposition="outside", textfont_size=11))
         fig.add_trace(go.Bar(name="Maintenance Cost", x=categories, y=maint_costs,
-                             marker_color="#1d4ed8", text=[f"${v:,.0f}" for v in maint_costs],
+                             marker_color="#111827", text=[f"${v:,.0f}" for v in maint_costs],
                              textposition="outside", textfont_size=11))
         fig.add_trace(go.Bar(name="Tool Cost", x=categories, y=tool_costs,
                              marker_color="#0891b2", text=[f"${v:,.0f}" for v in tool_costs],
@@ -130,7 +130,7 @@ def render() -> None:
                        tickprefix="$", tickformat=",.0f"),
             font=dict(family="Inter, sans-serif"),
         )
-        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
 
     with col_pie:
         section_title("Planned Cost Breakdown")
@@ -139,7 +139,7 @@ def render() -> None:
         fig2 = go.Figure(go.Pie(
             labels=labels, values=values,
             hole=0.55,
-            marker_colors=["#bfdbfe", "#1d4ed8", "#0891b2"],
+            marker_colors=["#bfdbfe", "#111827", "#0891b2"],
             textinfo="percent+label",
             textfont_size=11,
             hovertemplate="%{label}: $%{value:,.0f}<extra></extra>",
@@ -155,14 +155,14 @@ def render() -> None:
             )],
             font=dict(family="Inter, sans-serif"),
         )
-        st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig2, width='stretch', config={"displayModeBar": False})
 
     spacer(16)
 
     # ── ROI + Savings summary ─────────────────────────────────────
     section_title("Return on Investment")
     st.markdown(
-        f'<div style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8);'
+        f'<div style="background:linear-gradient(135deg,#1e3a8a,#111827);'
         f'border-radius:14px;padding:24px 28px;color:#fff;">'
         f'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:20px">'
         f'<div><div style="font-size:0.68rem;color:#93c5fd;text-transform:uppercase;'
@@ -209,7 +209,7 @@ def render() -> None:
     ))
     fig3.add_trace(go.Scatter(
         x=rul_points, y=risk_grow, name="Failure Risk (%)",
-        line=dict(color="#1d4ed8", width=2),
+        line=dict(color="#111827", width=2),
         yaxis="y2",
         hovertemplate="RUL: %{x:.1f} min → Risk: %{y:.1f}%<extra></extra>",
     ))
@@ -229,4 +229,4 @@ def render() -> None:
         legend=dict(orientation="h", y=1.06, font_size=11),
         font=dict(family="Inter, sans-serif"),
     )
-    st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig3, width='stretch', config={"displayModeBar": False})

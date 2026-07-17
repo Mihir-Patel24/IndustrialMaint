@@ -1,100 +1,108 @@
 /* =================================================================
-   IndustrialMaint AI — Enterprise Design System v4.0
-   Inspired by: Siemens MindSphere, Azure IoT Central, Linear, Stripe
+   IndustrialMaint AI — Clean Black & White Design System v5.0
+   Pure monochrome palette. No blue tints anywhere.
+   Status colours (green/amber/red) preserved for safety signals.
    ================================================================= */
 
 /* ── Google Fonts ─────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ── CSS Custom Properties ────────────────────────────────────── */
 :root {
-  /* Backgrounds */
-  --bg-app:        #F5F7FA;
+  /* ── Light Mode (default) ── */
+  --bg-app:        #FFFFFF;
   --bg-card:       #FFFFFF;
-  --bg-secondary:  #FAFAFB;
-  --bg-hover:      #F0F4FF;
+  --bg-secondary:  #F9FAFB;
+  --bg-hover:      #F3F4F6;
 
-  /* Borders */
   --border:        #E5E7EB;
-  --border-focus:  #2563EB;
+  --border-strong: #D1D5DB;
+  --border-focus:  #111827;
 
-  /* Brand Colors */
-  --blue:          #2563EB;
-  --blue-light:    #EFF6FF;
-  --blue-mid:      #DBEAFE;
+  /* Accent — pure black replaces all blues */
+  --accent:        #2563EB;
+  --accent-light:  #EFF6FF;
+  --accent-mid:    #DBEAFE;
+
+  /* Semantic Status (kept for safety signals) */
   --green:         #16A34A;
   --green-light:   #F0FDF4;
+  --green-border:  #BBF7D0;
   --amber:         #F59E0B;
   --amber-light:   #FFFBEB;
+  --amber-border:  #FDE68A;
   --red:           #DC2626;
   --red-light:     #FEF2F2;
+  --red-border:    #FECACA;
 
   /* Text */
-  --text-primary:  #111827;
-  --text-secondary:#6B7280;
-  --text-muted:    #9CA3AF;
-  --text-link:     #2563EB;
+  --text-primary:   #111827;
+  --text-secondary: #4B5563;
+  --text-muted:     #9CA3AF;
+  --text-inverse:   #FFFFFF;
 
-  /* Sidebar */
-  --sidebar-bg:    #0F172A;
-  --sidebar-hover: #1E293B;
-  --sidebar-active:#2563EB;
-  --sidebar-text:  #CBD5E1;
-  --sidebar-muted: #64748B;
+  /* Sidebar — original dark navy */
+  --sidebar-bg:     #0F172A;
+  --sidebar-hover:  #1E293B;
+  --sidebar-active: #2563EB;
+  --sidebar-border: rgba(255,255,255,0.06);
+  --sidebar-text:   #CBD5E1;
+  --sidebar-muted:  #64748B;
 
   /* Shadows */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
-  --shadow-lg:  0 8px 24px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.08);
 
   /* Spacing (8pt grid) */
-  --space-1: 8px;
-  --space-2: 16px;
-  --space-3: 24px;
-  --space-4: 32px;
-  --space-5: 40px;
-  --space-6: 48px;
+  --space-1: 8px;   --space-2: 16px;  --space-3: 24px;
+  --space-4: 32px;  --space-5: 40px;  --space-6: 48px;
 
   /* Radius */
-  --radius-sm:  6px;
-  --radius-md:  10px;
-  --radius-lg:  14px;
-  --radius-xl:  20px;
+  --radius-sm:  6px;  --radius-md:  10px;
+  --radius-lg:  14px; --radius-xl:  20px;
 
   /* Typography */
-  --font:       'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ── Global Reset ─────────────────────────────────────────────── */
 html, body, [class*="css"] {
   font-family: var(--font) !important;
-  font-size:   14px;
-  line-height: 1.6;
-  color:       var(--text-primary);
-  -webkit-font-smoothing: antialiased;
+  font-size:   16px !important;
+  line-height: 1.6 !important;
+  color:       var(--text-primary) !important;
+  -webkit-font-smoothing: antialiased !important;
 }
 
-/* ── App Background ───────────────────────────────────────────── */
-.stApp {
-  background: var(--bg-app) !important;
-}
+/* App background handled by config.toml (backgroundColor = "#FFFFFF")
+   Do NOT set background here — login page needs its own gradient to win */
 
 /* ── Remove Streamlit Default Padding ─────────────────────────── */
 .main .block-container {
   padding: var(--space-4) var(--space-4) var(--space-6) var(--space-4) !important;
-  max-width: 1400px !important;
+  max-width: 1440px !important;
+}
+
+/* ── HIDE Streamlit chrome ─────────────────────────────────────── */
+#MainMenu, footer, header { display: none !important; }
+[data-testid="stToolbar"]  { display: none !important; }
+[data-testid="stDecoration"] { display: none !important; }
+.viewerBadge_container__1QSob { display: none !important; }
+
+/* ── NUKE ALL BLUE BACKGROUNDS from Streamlit injected wrapper ── */
+[data-testid="stMarkdownContainer"] {
+  background: transparent !important;
 }
 
 /* ── SIDEBAR ──────────────────────────────────────────────────── */
 [data-testid="stSidebar"] {
   background: var(--sidebar-bg) !important;
-  border-right: 1px solid rgba(255,255,255,0.06) !important;
+  border-right: 1px solid var(--sidebar-border) !important;
 }
-
 [data-testid="stSidebar"] > div:first-child {
   padding: 0 !important;
 }
-
 [data-testid="stSidebar"] * {
   color: var(--sidebar-text) !important;
 }
@@ -104,48 +112,31 @@ html, body, [class*="css"] {
   background:    transparent !important;
   border:        none !important;
   color:         var(--sidebar-text) !important;
-  font-size:     13px !important;
+  font-size:     14px !important;
   font-weight:   400 !important;
-  padding:       9px 16px !important;
+  padding:       10px 16px !important;
   border-radius: var(--radius-md) !important;
   text-align:    left !important;
   width:         100% !important;
   transition:    all 0.15s ease !important;
   margin:        1px 0 !important;
   box-shadow:    none !important;
-  letter-spacing: 0.01em !important;
 }
-
 [data-testid="stSidebar"] .stButton > button:hover {
   background: var(--sidebar-hover) !important;
-  color:      #F1F5F9 !important;
+  color:      #F9FAFB !important;
 }
-
-/* Primary sidebar button (Sign In, etc.) */
-[data-testid="stSidebar"] .stButton > button[kind="primary"] {
-  background: var(--sidebar-active) !important;
-  color:      #FFFFFF !important;
-}
-
-/* Sidebar toggle / radio */
 [data-testid="stSidebar"] [data-testid="stToggle"] label,
 [data-testid="stSidebar"] label {
   color: var(--sidebar-muted) !important;
-  font-size: 12px !important;
+  font-size: 13px !important;
 }
 
-/* ── HIDE Streamlit chrome ─────────────────────────────────────── */
-#MainMenu, footer, header { display: none !important; }
-[data-testid="stToolbar"]  { display: none !important; }
-[data-testid="stDecoration"] { display: none !important; }
-.viewerBadge_container__1QSob { display: none !important; }
-
-/* ── SECTION TITLES — fix the blue-block problem ─────────────── */
-/* Override our custom section-title class to NOT use blue bg */
+/* ── SECTION TITLES ───────────────────────────────────────────── */
 .section-title {
-  font-size:      11px !important;
-  font-weight:    600 !important;
-  letter-spacing: 0.08em !important;
+  font-size:      12px !important;
+  font-weight:    700 !important;
+  letter-spacing: 0.1em !important;
   text-transform: uppercase !important;
   color:          var(--text-muted) !important;
   background:     transparent !important;
@@ -153,11 +144,6 @@ html, body, [class*="css"] {
   margin:         0 0 var(--space-2) 0 !important;
   border:         none !important;
   display:        block !important;
-}
-
-/* Also reset any stMarkdown that wraps our section-title HTMLs */
-[data-testid="stMarkdownContainer"] > div > div {
-  background: transparent !important;
 }
 
 /* ── CARDS ────────────────────────────────────────────────────── */
@@ -169,7 +155,6 @@ html, body, [class*="css"] {
   box-shadow:    var(--shadow-sm);
   transition:    box-shadow 0.2s ease, transform 0.2s ease;
 }
-
 .pm-card:hover {
   box-shadow: var(--shadow-md);
   transform:  translateY(-1px);
@@ -186,29 +171,23 @@ html, body, [class*="css"] {
   overflow:      hidden;
   transition:    box-shadow 0.2s ease;
 }
-
 .kpi-card:hover { box-shadow: var(--shadow-md); }
 
 .kpi-card__label {
-  font-size:      11px;
-  font-weight:    600;
-  letter-spacing: 0.07em;
+  font-size:      12px;
+  font-weight:    700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color:          var(--text-muted);
+  color:          var(--text-secondary);
   margin-bottom:  8px;
-  white-space:    nowrap;
-  overflow:       hidden;
-  text-overflow:  ellipsis;
 }
-
 .kpi-card__value {
-  font-size:   28px;
+  font-size:   30px;
   font-weight: 700;
   line-height: 1.1;
   color:       var(--text-primary);
   margin:      4px 0 8px 0;
 }
-
 .kpi-card__status {
   font-size:     12px;
   font-weight:   500;
@@ -216,58 +195,68 @@ html, body, [class*="css"] {
   border-radius: 20px;
   display:       inline-block;
 }
-
 .kpi-card__bar {
-  height:        3px;
+  height:        4px;
   border-radius: 2px;
   background:    var(--border);
   margin-top:    12px;
   overflow:      hidden;
 }
-
 .kpi-card__bar-fill {
   height:        100%;
   border-radius: 2px;
   transition:    width 0.4s ease;
 }
-
 .kpi-card__trend {
-  font-size:   11px;
+  font-size:   12px;
   font-weight: 500;
   color:       var(--text-secondary);
   margin-top:  6px;
 }
 
-/* Status colors — use green/amber/red without bright backgrounds */
+/* Status colors */
 .status-healthy  { color: var(--green); background: var(--green-light); }
 .status-warning  { color: #92400E;      background: var(--amber-light); }
 .status-critical { color: var(--red);   background: var(--red-light);   }
-.status-info     { color: var(--blue);  background: var(--blue-light);  }
+.status-info     { color: var(--accent); background: var(--accent-light); }
 
-/* ── ALERT BANNER ─────────────────────────────────────────────── */
+/* ── BADGES ─────────────────────────────────────────────────────── */
+.badge {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           5px;
+  font-size:     12px;
+  font-weight:   600;
+  padding:       3px 10px;
+  border-radius: 20px;
+  line-height:   1.4;
+}
+.badge-blue    { background: var(--accent-mid);   color: var(--accent); }
+.badge-green   { background: var(--green-light);  color: var(--green); }
+.badge-amber   { background: var(--amber-light);  color: #92400E; }
+.badge-red     { background: var(--red-light);    color: var(--red); }
+.badge-gray    { background: #F3F4F6;             color: #374151; }
+
+/* ── ALERT BANNERS ────────────────────────────────────────────── */
 .alert-banner-critical {
   background:    var(--red-light);
-  border:        1px solid #FECACA;
+  border:        1px solid var(--red-border);
   border-left:   4px solid var(--red);
   border-radius: var(--radius-md);
   padding:       12px var(--space-2);
   margin-bottom: var(--space-3);
-  font-size:     13px;
+  font-size:     14px;
   font-weight:   500;
   color:         #7F1D1D;
-  display:       flex;
-  align-items:   center;
-  gap:           10px;
 }
-
 .alert-banner-warning {
   background:  var(--amber-light);
-  border:      1px solid #FDE68A;
+  border:      1px solid var(--amber-border);
   border-left: 4px solid var(--amber);
   border-radius: var(--radius-md);
   padding:     12px var(--space-2);
   margin-bottom: var(--space-3);
-  font-size:   13px;
+  font-size:   14px;
   font-weight: 500;
   color:       #78350F;
 }
@@ -281,89 +270,60 @@ html, body, [class*="css"] {
   margin-bottom:   var(--space-4);
   border-bottom:   1px solid var(--border);
 }
-
 .page-header__title {
   font-size:   28px;
-  font-weight: 700;
+  font-weight: 800;
   color:       var(--text-primary);
   line-height: 1.2;
 }
-
 .page-header__subtitle {
-  font-size:  13px;
+  font-size:  14px;
   color:      var(--text-secondary);
-  margin-top: 3px;
+  margin-top: 4px;
 }
-
 .page-header__meta {
-  display:        flex;
-  align-items:    center;
-  gap:            10px;
-  flex-shrink:    0;
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  flex-shrink: 0;
 }
-
-/* ── METRIC BADGES ────────────────────────────────────────────── */
-.badge {
-  display:       inline-flex;
-  align-items:   center;
-  gap:           5px;
-  font-size:     11px;
-  font-weight:   600;
-  padding:       3px 10px;
-  border-radius: 20px;
-  line-height:   1.4;
-}
-
-.badge-blue    { background: var(--blue-mid);     color: #1D4ED8; }
-.badge-green   { background: var(--green-light);  color: #15803D; }
-.badge-amber   { background: var(--amber-light);  color: #92400E; }
-.badge-red     { background: var(--red-light);    color: #B91C1C; }
-.badge-gray    { background: #F3F4F6;             color: #374151; }
 
 /* ── FORMS ────────────────────────────────────────────────────── */
-/* Fix label visibility and spacing */
-.stTextInput > label,
-.stNumberInput > label,
-.stSelectbox > label,
-.stTextArea > label {
-  font-size:     13px !important;
-  font-weight:   500 !important;
+.stTextInput label,
+.stNumberInput label,
+.stSelectbox label,
+.stTextArea label {
+  font-size:     14px !important;
+  font-weight:   600 !important;
   color:         var(--text-primary) !important;
   margin-bottom: 6px !important;
-  letter-spacing: 0 !important;
 }
-
-.stTextInput > div > div > input,
-.stNumberInput > div > div > input {
+.stTextInput input,
+.stNumberInput input {
   height:        44px !important;
   border-radius: var(--radius-md) !important;
-  border-color:  var(--border) !important;
-  font-size:     14px !important;
+  border:        1px solid var(--border-strong) !important;
+  font-size:     15px !important;
   color:         var(--text-primary) !important;
   padding:       0 14px !important;
   background:    var(--bg-card) !important;
   box-shadow:    none !important;
-  transition:    border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
-
-.stTextInput > div > div > input:focus,
-.stNumberInput > div > div > input:focus {
+.stTextInput input:focus,
+.stNumberInput input:focus {
   border-color: var(--border-focus) !important;
-  box-shadow:   0 0 0 3px rgba(37,99,235,0.10) !important;
+  box-shadow:   0 0 0 3px rgba(0,0,0,0.10) !important;
 }
-
-.stSelectbox > div > div {
+.stSelectbox [data-baseweb="select"] {
   border-radius: var(--radius-md) !important;
-  border-color:  var(--border) !important;
-  min-height:    44px !important;
+  border:        1px solid var(--border-strong) !important;
   background:    var(--bg-card) !important;
 }
 
 /* ── BUTTONS ──────────────────────────────────────────────────── */
-/* Main content area buttons */
 .main .stButton > button {
   border-radius: var(--radius-md) !important;
-  font-size:     13px !important;
+  font-size:     14px !important;
   font-weight:   500 !important;
   padding:       10px 20px !important;
   transition:    all 0.15s ease !important;
@@ -371,49 +331,50 @@ html, body, [class*="css"] {
   background:    var(--bg-card) !important;
   color:         var(--text-primary) !important;
   box-shadow:    var(--shadow-sm) !important;
-  letter-spacing: 0.01em !important;
 }
-
 .main .stButton > button:hover {
-  background:  var(--bg-hover) !important;
+  background:   var(--bg-hover) !important;
   border-color: var(--border-focus) !important;
-  color:        var(--blue) !important;
   box-shadow:   var(--shadow-md) !important;
 }
-
-/* Primary button */
 .main .stButton > button[kind="primary"] {
-  background:   var(--blue) !important;
-  border-color: var(--blue) !important;
+  background:   var(--accent) !important;
+  border-color: var(--accent) !important;
   color:        #FFFFFF !important;
 }
-
 .main .stButton > button[kind="primary"]:hover {
-  background:   #1D4ED8 !important;
-  border-color: #1D4ED8 !important;
-  color:        #FFFFFF !important;
+  background:   #374151 !important;
+  border-color: #374151 !important;
 }
-
-/* Form submit button */
 .stFormSubmitButton > button {
   border-radius: var(--radius-md) !important;
-  font-size:     14px !important;
+  font-size:     15px !important;
   font-weight:   600 !important;
   padding:       12px 28px !important;
-  transition:    all 0.15s ease !important;
 }
-
 .stFormSubmitButton > button[kind="primary"] {
-  background:   var(--blue) !important;
-  border-color: var(--blue) !important;
+  background:   var(--accent) !important;
+  border-color: var(--accent) !important;
   color:        #FFFFFF !important;
-  box-shadow:   0 2px 8px rgba(37,99,235,0.25) !important;
+  box-shadow:   0 2px 8px rgba(0,0,0,0.25) !important;
+}
+.stFormSubmitButton > button[kind="primary"]:hover {
+  background:   #374151 !important;
+  box-shadow:   0 4px 12px rgba(0,0,0,0.35) !important;
+  transform:    translateY(-1px) !important;
 }
 
-.stFormSubmitButton > button[kind="primary"]:hover {
-  background:   #1D4ED8 !important;
-  box-shadow:   0 4px 12px rgba(37,99,235,0.35) !important;
-  transform:    translateY(-1px) !important;
+/* ── DOWNLOAD BUTTON ──────────────────────────────────────────── */
+.stDownloadButton > button {
+  background:    var(--accent-light) !important;
+  border:        1px solid var(--border-strong) !important;
+  color:         var(--text-primary) !important;
+  border-radius: var(--radius-md) !important;
+  font-size:     14px !important;
+  font-weight:   500 !important;
+}
+.stDownloadButton > button:hover {
+  background: var(--bg-hover) !important;
 }
 
 /* ── DATA TABLE ───────────────────────────────────────────────── */
@@ -429,20 +390,18 @@ html, body, [class*="css"] {
   border-bottom: 1px solid var(--border) !important;
   gap:           0 !important;
 }
-
 .stTabs [data-baseweb="tab"] {
-  font-size:   13px !important;
+  font-size:   14px !important;
   font-weight: 500 !important;
   color:       var(--text-secondary) !important;
   padding:     10px 20px !important;
   border-bottom: 2px solid transparent !important;
   background:  transparent !important;
 }
-
 .stTabs [aria-selected="true"] {
-  color:        var(--blue) !important;
-  border-bottom-color: var(--blue) !important;
-  font-weight:  600 !important;
+  color:        var(--text-primary) !important;
+  border-bottom-color: var(--accent) !important;
+  font-weight:  700 !important;
 }
 
 /* ── CHARTS / PLOTLY ──────────────────────────────────────────── */
@@ -456,7 +415,7 @@ html, body, [class*="css"] {
 
 /* ── EXPANDER ─────────────────────────────────────────────────── */
 .streamlit-expanderHeader {
-  font-size:   14px !important;
+  font-size:   15px !important;
   font-weight: 600 !important;
   color:       var(--text-primary) !important;
   background:  var(--bg-secondary) !important;
@@ -470,36 +429,28 @@ html, body, [class*="css"] {
   border-radius: var(--radius-lg) !important;
   padding:       16px !important;
 }
-
 [data-testid="stMetricLabel"] {
-  font-size:   12px !important;
-  font-weight: 500 !important;
+  font-size:   13px !important;
+  font-weight: 600 !important;
   color:       var(--text-secondary) !important;
 }
-
 [data-testid="stMetricValue"] {
-  font-size:   28px !important;
+  font-size:   30px !important;
   font-weight: 700 !important;
   color:       var(--text-primary) !important;
 }
 
-/* ── RADIO BUTTONS ────────────────────────────────────────────── */
-.stRadio > label {
-  font-size:  13px !important;
-  color:      var(--text-primary) !important;
+/* ── RADIO / CHECKBOX / SLIDER ────────────────────────────────── */
+.stRadio > label, .stCheckbox > label {
+  font-size:   14px !important;
+  color:       var(--text-primary) !important;
   font-weight: 500 !important;
 }
-
-/* ── CHECKBOX ─────────────────────────────────────────────────── */
-.stCheckbox > label {
-  font-size: 13px !important;
-  color:     var(--text-primary) !important;
-}
-
-/* ── SLIDER ───────────────────────────────────────────────────── */
 .stSlider > div > div > div > div {
-  background: var(--blue) !important;
+  background: var(--accent) !important;
 }
+.stProgress > div > div { background: var(--border) !important; border-radius: 4px !important; }
+.stProgress > div > div > div { background: var(--accent) !important; border-radius: 4px !important; }
 
 /* ── DIVIDER ──────────────────────────────────────────────────── */
 hr {
@@ -508,40 +459,10 @@ hr {
   margin: var(--space-4) 0 !important;
 }
 
-/* ── PROGRESS BAR ─────────────────────────────────────────────── */
-.stProgress > div > div {
-  background: var(--border) !important;
-  border-radius: 4px !important;
-}
-.stProgress > div > div > div {
-  background:    var(--blue) !important;
-  border-radius: 4px !important;
-}
-
-/* ── DOWNLOAD BUTTON ──────────────────────────────────────────── */
-.stDownloadButton > button {
-  background:    var(--blue-light) !important;
-  border:        1px solid var(--blue-mid) !important;
-  color:         var(--blue) !important;
-  border-radius: var(--radius-md) !important;
-  font-size:     13px !important;
-  font-weight:   500 !important;
-}
-
-.stDownloadButton > button:hover {
-  background: var(--blue-mid) !important;
-}
-
 /* ── SCROLLBAR ────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background:    #D1D5DB;
-  border-radius: 3px;
-}
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
 /* ── ANIMATIONS ───────────────────────────────────────────────── */
@@ -549,64 +470,9 @@ hr {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0);   }
 }
+.stApp > .main { animation: fadeInUp 0.3s ease; }
 
-.stApp > .main {
-  animation: fadeInUp 0.3s ease;
-}
-
-/* ── FIX: Remove blue block highlights on all text ─────────────── */
-/* This is the primary fix for the blue-background-on-all-text bug */
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] div,
-[data-testid="stMarkdownContainer"] span {
-  background: transparent !important;
-}
-
-/* But allow our intentional colored elements */
-[data-testid="stMarkdownContainer"] .pm-card,
-[data-testid="stMarkdownContainer"] .kpi-card,
-[data-testid="stMarkdownContainer"] .badge,
-[data-testid="stMarkdownContainer"] .status-healthy,
-[data-testid="stMarkdownContainer"] .status-warning,
-[data-testid="stMarkdownContainer"] .status-critical,
-[data-testid="stMarkdownContainer"] .alert-banner-critical,
-[data-testid="stMarkdownContainer"] .alert-banner-warning {
-  background: revert !important;
-}
-
-/* ── DARK MODE ────────────────────────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-app:       #0F172A;
-    --bg-card:      #1E293B;
-    --bg-secondary: #1A2332;
-    --bg-hover:     #1D2D50;
-    --border:       #334155;
-    --text-primary: #F1F5F9;
-    --text-secondary:#94A3B8;
-    --text-muted:   #64748B;
-    --blue-light:   #1E3A5F;
-    --blue-mid:     #1E40AF;
-    --green-light:  #052e16;
-    --amber-light:  #431407;
-    --red-light:    #3B0000;
-  }
-}
-
-/* ── RESPONSIVE ───────────────────────────────────────────────── */
-@media (max-width: 1366px) {
-  .main .block-container {
-    padding: var(--space-3) !important;
-  }
-}
-
-/* ── PRINT ────────────────────────────────────────────────────── */
-@media print {
-  [data-testid="stSidebar"] { display: none !important; }
-  .stApp { background: white !important; }
-}
-
-/* ── SIDEBAR COMPONENT CLASSES (used by app.py) ──────────────── */
+/* ── SIDEBAR COMPONENT CLASSES ─────────────────────────────────── */
 .sb-brand {
   display:     flex;
   align-items: center;
@@ -615,7 +481,6 @@ hr {
   border-bottom: 1px solid rgba(255,255,255,0.07);
   margin-bottom: 8px;
 }
-
 .sb-brand-icon {
   width:         36px;
   height:        36px;
@@ -626,145 +491,131 @@ hr {
   justify-content: center;
   flex-shrink:   0;
 }
-
 .sb-brand-name {
-  font-size:   14px;
+  font-size:   15px;
   font-weight: 700;
   color:       #F1F5F9 !important;
   line-height: 1.2;
 }
-
 .sb-brand-sub {
-  font-size: 11px;
-  color:     #64748B !important;
+  font-size:  11px;
+  color:      #9CA3AF !important;
   margin-top: 1px;
 }
-
 .sb-status {
   display:     flex;
   align-items: center;
   gap:         7px;
-  font-size:   11px;
-  color:       #64748B !important;
+  font-size:   12px;
+  color:       #9CA3AF !important;
   padding:     4px 16px 8px;
 }
-
 .sb-status-dot {
   width:         7px;
   height:        7px;
   border-radius: 50%;
   flex-shrink:   0;
 }
-
 .sb-group {
   font-size:      10px;
   font-weight:    700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color:          #475569 !important;
+  color:          #6B7280 !important;
   padding:        16px 16px 4px;
 }
-
 .sb-user {
-  display:       flex;
-  align-items:   center;
-  gap:           10px;
-  padding:       12px 16px;
-  border-top:    1px solid rgba(255,255,255,0.07);
-  margin-top:    8px;
+  display:    flex;
+  align-items: center;
+  gap:         10px;
+  padding:     12px 16px;
+  border-top:  1px solid rgba(255,255,255,0.07);
+  margin-top:  8px;
 }
-
 .sb-avatar {
-  width:            34px;
-  height:           34px;
-  border-radius:    10px;
-  display:          flex;
-  align-items:      center;
-  justify-content:  center;
-  font-size:        12px;
-  font-weight:      700;
-  color:            #FFFFFF !important;
-  flex-shrink:      0;
+  width:           34px;
+  height:          34px;
+  border-radius:   10px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  font-size:       12px;
+  font-weight:     700;
+  color:           #FFFFFF !important;
+  flex-shrink:     0;
 }
-
 .sb-user-name {
-  font-size:   13px;
+  font-size:   14px;
   font-weight: 600;
   color:       #E2E8F0 !important;
   line-height: 1.2;
 }
-
 .sb-user-role {
   font-size: 11px;
-  color:     #64748B !important;
+  color:     #9CA3AF !important;
 }
 
-/* ── TOP HEADER (used by app.py) ─────────────────────────────── */
+/* ── TOP HEADER ──────────────────────────────────────────────── */
 .top-header {
   display:         flex;
   justify-content: space-between;
   align-items:     flex-start;
   padding-bottom:  20px;
   margin-bottom:   24px;
-  border-bottom:   1px solid #E5E7EB;
+  border-bottom:   1px solid var(--border);
 }
-
 .header-title {
-  font-size:   26px;
-  font-weight: 700;
-  color:       #111827;
+  font-size:   28px;
+  font-weight: 800;
+  color:       var(--text-primary);
   line-height: 1.2;
 }
-
 .header-breadcrumb {
-  font-size:  13px;
-  color:      #6B7280;
-  margin-top: 3px;
+  font-size:  14px;
+  color:      var(--text-secondary);
+  margin-top: 4px;
 }
-
 .header-right {
-  display:      flex;
-  align-items:  center;
-  gap:          10px;
-  flex-shrink:  0;
-  padding-top:  4px;
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  flex-shrink: 0;
+  padding-top: 4px;
 }
-
 .header-badge {
-  background:    #FEF2F2;
-  border:        1px solid #FECACA;
-  color:         #B91C1C;
-  font-size:     11px;
+  background:    var(--red-light);
+  border:        1px solid var(--red-border);
+  color:         var(--red);
+  font-size:     12px;
   font-weight:   600;
   padding:       4px 10px;
   border-radius: 20px;
   white-space:   nowrap;
 }
-
 .header-time {
-  font-size:  12px;
-  color:      #9CA3AF;
+  font-size:   12px;
+  color:       var(--text-muted);
   white-space: nowrap;
 }
-
 .header-version {
-  font-size:     11px;
+  font-size:     12px;
   font-weight:   600;
-  background:    #EFF6FF;
-  color:         #2563EB;
+  background:    var(--accent-light);
+  color:         var(--text-primary);
   padding:       3px 8px;
   border-radius: 6px;
+  border:        1px solid var(--border);
 }
 
 /* ── CRITICAL BANNER ─────────────────────────────────────────── */
 .critical-banner {
-  background:    #FEF2F2;
-  border:        1px solid #FECACA;
-  border-left:   4px solid #DC2626;
-  border-radius: 10px;
+  background:    var(--red-light);
+  border:        1px solid var(--red-border);
+  border-left:   4px solid var(--red);
+  border-radius: var(--radius-md);
   padding:       12px 16px;
   margin-bottom: 20px;
-  font-size:     13px;
+  font-size:     14px;
   font-weight:   500;
   color:         #7F1D1D;
 }
@@ -776,24 +627,16 @@ hr {
   align-items:     center;
   padding-top:     24px;
   margin-top:      40px;
-  border-top:      1px solid #E5E7EB;
-  font-size:       11px;
-  color:           #9CA3AF;
+  border-top:      1px solid var(--border);
+  font-size:       12px;
+  color:           var(--text-muted);
 }
 
-/* ── PREVENT STREAMLIT FROM ADDING BLUE HIGHLIGHT ON HTML BLOCKS */
-/* This is specific to how Streamlit wraps st.markdown HTML content */
-[data-testid="stMarkdownContainer"] > div > div[data-testid] {
-  background: transparent !important;
+/* ── RESPONSIVE ───────────────────────────────────────────────── */
+@media (max-width: 1366px) {
+  .main .block-container { padding: var(--space-3) !important; }
 }
-
-/* Override Streamlit's blue text-selection-like highlight on paragraph text */
-p[data-testid], div[data-testid="stText"] {
-  background: transparent !important;
-}
-
-/* Fix: Streamlit sometimes wraps custom HTML in a p tag that gets blue bg */
-[data-testid="stMarkdownContainer"] p {
-  background: transparent !important;
-  color: inherit !important;
+@media print {
+  [data-testid="stSidebar"] { display: none !important; }
+  .stApp { background: white !important; }
 }

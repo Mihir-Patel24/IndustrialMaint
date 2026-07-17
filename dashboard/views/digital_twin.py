@@ -14,13 +14,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from components import section_title, spacer, kpi_card, digital_twin
 from utils.oee_calculator import OEEInput, calculate_oee, simulate_sensor_drift, lifetime_forecast
 
-_SLATE  = "#1e293b"
-_GRAY   = "#64748b"
-_WHITE  = "#ffffff"
-_BORDER = "#e2e8f0"
+_SLATE  = "#111827"
+_GRAY   = "#6B7280"
+_WHITE  = "#FFFFFF"
+_BORDER = "#E5E7EB"
 
 
-def _gauge(value: float, title: str, invert: bool = False, h: int = 180) -> go.Figure:
+def _gauge(value: float, title: str, invert: bool = False) -> go.Figure:
     col = (
         "#DC2626" if (invert and value >= 60) or (not invert and value < 40) else
         "#F59E0B" if (invert and value >= 35) or (not invert and value < 70) else
@@ -29,11 +29,11 @@ def _gauge(value: float, title: str, invert: bool = False, h: int = 180) -> go.F
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=value,
-        number={"suffix": "%", "font": {"size": 26, "family": "Inter", "color": "#111827"}},
+        number={"suffix": "%", "font": {"size": 20, "family": "Inter", "color": "#111827"}},
         gauge={
             "axis":  {"range": [0, 100], "tickwidth": 1, "tickcolor": "#E5E7EB",
-                      "tickfont": {"size": 10, "color": "#9CA3AF"}},
-            "bar":   {"color": col, "thickness": 0.22},
+                      "tickfont": {"size": 9, "color": "#9CA3AF"}},
+            "bar":   {"color": col, "thickness": 0.25},
             "bgcolor": "white", "bordercolor": "#E5E7EB", "borderwidth": 1,
             "steps": [
                 {"range": [0, 40],  "color": "#FEF2F2"},
@@ -45,10 +45,10 @@ def _gauge(value: float, title: str, invert: bool = False, h: int = 180) -> go.F
                 {"range": [60, 100],"color": "#FEF2F2"},
             ],
         },
-        title={"text": title, "font": {"size": 14, "color": "#6B7280", "family": "Inter"}},
+        title={"text": title, "font": {"size": 12, "color": "#6B7280", "family": "Inter"}},
     ))
     fig.update_layout(
-        height=h, margin=dict(t=20, b=8, l=16, r=16),
+        height=140, margin=dict(t=16, b=2, l=10, r=10),
         paper_bgcolor="white", plot_bgcolor="white",
         font={"family": "Inter"},
     )
@@ -105,17 +105,15 @@ def render() -> None:
 
     # Dynamic degradation simulation
     tick = st.session_state.telemetry_tick
-    # Degrade slightly over time if live mode is on
-    sim_th = max(0.0, tool_health - (tick * 0.1))
-    sim_mh = max(0.0, mach_health - (tick * 0.05))
-    sim_fr = min(100.0, fail_risk + (tick * 0.15))
+    sim_th  = max(0.0, tool_health - (tick * 0.1))
+    sim_mh  = max(0.0, mach_health - (tick * 0.05))
+    sim_fr  = min(100.0, fail_risk + (tick * 0.15))
     sim_rul = max(0.0, rul_mins - (tick * 0.5))
 
     # ── OEE Calculation ───────────────────────────────────────────
-    # We simulate a shift's production parameters based on machine health
     oee_input = OEEInput(
         planned_production_time=8.0,
-        downtime=0.5 + (sim_fr / 100 * 2.0), # Higher risk = more micro stops
+        downtime=0.5 + (sim_fr / 100 * 2.0),
         ideal_cycle_time=1.5,
         total_parts_produced=280 - int(tick / 2),
         good_parts=260 - int(sim_fr / 2),
@@ -130,25 +128,30 @@ def render() -> None:
     # ── Top KPIs ──────────────────────────────────────────────────
     c1, c2, c3, c4 = st.columns(4)
     with c1: kpi_card("Overall OEE", f"{res.oee}%", f"Grade: {res.oee_grade}", color="#16A34A" if res.oee >= 70 else "#D97706" if res.oee >= 60 else "#DC2626")
-    with c2: kpi_card("Risk-Adjusted OEE", f"{res.risk_adjusted_oee}%", "AI Penalized", color="#2563EB")
+    with c2: kpi_card("Risk-Adjusted OEE", f"{res.risk_adjusted_oee}%", "AI Penalized", color="#111827")
     with c3: kpi_card("MTBF", f"{res.mtbf} hr", "Mean Time Between Failures", color="#16A34A" if res.mtbf > 5 else "#D97706")
-    with c4: kpi_card("MTTR", f"{res.mttr} hr", "Mean Time To Repair", color="#2563EB")
+    with c4: kpi_card("MTTR", f"{res.mttr} hr", "Mean Time To Repair", color="#111827")
 
     spacer(24)
 
-    # ── Live Gauges & Digital Twin ────────────────────────────────
-    col_d, col_g = st.columns([1, 1])
-    
+    # ── Real-Time Component Status & OEE Gauges ───────────────────
+    # These two panels sit side-by-side and auto-size to content
+    col_d, col_g = st.columns(2)
+
     with col_d:
         st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:12px;padding:24px;height:420px;display:flex;flex-direction:column;justify-content:center;">',
+            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:14px;padding:20px;">',
             unsafe_allow_html=True
         )
-        st.markdown(f'<div style="font-size:14px;font-weight:700;color:{_GRAY};text-transform:uppercase;margin-bottom:20px;text-align:center;">Real-Time Component Status</div>', unsafe_allow_html=True)
-        
+        st.markdown(
+            f'<div style="font-size:13px;font-weight:700;color:{_GRAY};text-transform:uppercase;'
+            f'letter-spacing:0.07em;margin-bottom:18px;text-align:center;">Real-Time Component Status</div>',
+            unsafe_allow_html=True
+        )
+
         def _cstat(h: float) -> str:
             return "Healthy" if h >= 70 else "Warning" if h >= 40 else "Critical"
-        
+
         components = {
             "Motor":   (_cstat(sim_mh), sim_mh),
             "Tool":    (_cstat(sim_th), sim_th),
@@ -161,20 +164,25 @@ def render() -> None:
 
     with col_g:
         st.markdown(
-            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:12px;padding:24px;height:420px;">'
-            f'<div style="font-size:14px;font-weight:700;color:{_GRAY};text-transform:uppercase;margin-bottom:10px;">OEE Factors</div>',
+            f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:14px;padding:20px;">',
             unsafe_allow_html=True
         )
+        st.markdown(
+            f'<div style="font-size:13px;font-weight:700;color:{_GRAY};text-transform:uppercase;'
+            f'letter-spacing:0.07em;margin-bottom:10px;">OEE Factors</div>',
+            unsafe_allow_html=True
+        )
+        # 2x2 gauge grid — each gauge height=140 so 2 rows fit comfortably
         g1, g2 = st.columns(2)
         with g1:
-            st.plotly_chart(_gauge(res.availability, "Availability"), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_gauge(res.availability, "Availability"), width='stretch', config={"displayModeBar": False})
         with g2:
-            st.plotly_chart(_gauge(res.performance, "Performance"), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_gauge(res.performance, "Performance"), width='stretch', config={"displayModeBar": False})
         g3, g4 = st.columns(2)
         with g3:
-            st.plotly_chart(_gauge(res.quality, "Quality"), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_gauge(res.quality, "Quality"), width='stretch', config={"displayModeBar": False})
         with g4:
-            st.plotly_chart(_gauge(res.health_index, "Health Index"), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_gauge(res.health_index, "Health Index"), width='stretch', config={"displayModeBar": False})
         st.markdown('</div>', unsafe_allow_html=True)
 
     spacer(24)
@@ -182,25 +190,24 @@ def render() -> None:
     # ── Live Telemetry ────────────────────────────────────────────
     section_title("Live Sensor Telemetry")
     n_pts = 40
-    # Use tick offset to make drift continuous
     sim_base_th = tool_health - (max(0, tick-40) * 0.1)
-    
-    vibration = simulate_sensor_drift(0.5, sim_base_th, sim_fr, n_pts + tick, "vibration")[-n_pts:]
+
+    vibration   = simulate_sensor_drift(0.5,  sim_base_th, sim_fr, n_pts + tick, "vibration")[-n_pts:]
     temperature = simulate_sensor_drift(45.0, sim_base_th, sim_fr, n_pts + tick, "temperature")[-n_pts:]
-    power = simulate_sensor_drift(12.5, sim_mh, sim_fr, n_pts + tick, "power")[-n_pts:]
+    power       = simulate_sensor_drift(12.5, sim_mh,      sim_fr, n_pts + tick, "power")[-n_pts:]
 
     s1, s2, s3 = st.columns(3)
     with s1:
         st.markdown(f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:12px;padding:8px;">', unsafe_allow_html=True)
-        st.plotly_chart(_telemetry_chart(vibration, "Spindle Vibration", "mm/s", "rgb(99, 102, 241)"), use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(_telemetry_chart(vibration,   "Spindle Vibration", "mm/s", "rgb(99, 102, 241)"),  width='stretch', config={"displayModeBar": False})
         st.markdown('</div>', unsafe_allow_html=True)
     with s2:
         st.markdown(f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:12px;padding:8px;">', unsafe_allow_html=True)
-        st.plotly_chart(_telemetry_chart(temperature, "Tool Temperature", "°C", "rgb(239, 68, 68)"), use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(_telemetry_chart(temperature, "Tool Temperature",  "°C",   "rgb(239, 68, 68)"),   width='stretch', config={"displayModeBar": False})
         st.markdown('</div>', unsafe_allow_html=True)
     with s3:
         st.markdown(f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:12px;padding:8px;">', unsafe_allow_html=True)
-        st.plotly_chart(_telemetry_chart(power, "Motor Power", "kW", "rgb(34, 197, 94)"), use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(_telemetry_chart(power,        "Motor Power",       "kW",   "rgb(34, 197, 94)"),   width='stretch', config={"displayModeBar": False})
         st.markdown('</div>', unsafe_allow_html=True)
 
     spacer(24)
@@ -208,18 +215,18 @@ def render() -> None:
     # ── Lifetime Forecast ─────────────────────────────────────────
     section_title("Remaining Lifetime Forecast")
     forecast = lifetime_forecast(sim_th, sim_mh, sim_fr, sim_rul)
-    
+
     st.markdown(
-        f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:12px;padding:24px;">'
-        f'<div style="display:flex;gap:20px;">'
-        f'<div style="flex:1;"><div style="font-size:12px;color:{_GRAY};font-weight:600;text-transform:uppercase;">Estimated RUL</div>'
-        f'<div style="font-size:32px;font-weight:700;color:{_SLATE};">{forecast["rul_minutes"]} <span style="font-size:16px;">min</span></div></div>'
-        f'<div style="flex:1;"><div style="font-size:12px;color:#16A34A;font-weight:600;text-transform:uppercase;">Safe Operating Window</div>'
-        f'<div style="font-size:32px;font-weight:700;color:#16A34A;">{forecast["safe_hours"]} <span style="font-size:16px;">hr</span></div></div>'
-        f'<div style="flex:1;"><div style="font-size:12px;color:#D97706;font-weight:600;text-transform:uppercase;">Warning Window</div>'
-        f'<div style="font-size:32px;font-weight:700;color:#D97706;">{forecast["warning_hours"]} <span style="font-size:16px;">hr</span></div></div>'
-        f'<div style="flex:1;"><div style="font-size:12px;color:#DC2626;font-weight:600;text-transform:uppercase;">Critical Window</div>'
-        f'<div style="font-size:32px;font-weight:700;color:#DC2626;">{forecast["critical_hours"]} <span style="font-size:16px;">hr</span></div></div>'
+        f'<div style="background:{_WHITE};border:1px solid {_BORDER};border-radius:14px;padding:24px;">'
+        f'<div style="display:flex;gap:24px;flex-wrap:wrap;">'
+        f'<div style="flex:1;min-width:120px;"><div style="font-size:12px;color:{_GRAY};font-weight:600;text-transform:uppercase;margin-bottom:6px;">Estimated RUL</div>'
+        f'<div style="font-size:32px;font-weight:800;color:{_SLATE};">{forecast["rul_minutes"]} <span style="font-size:16px;font-weight:400;">min</span></div></div>'
+        f'<div style="flex:1;min-width:120px;"><div style="font-size:12px;color:#16A34A;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Safe Window</div>'
+        f'<div style="font-size:32px;font-weight:800;color:#16A34A;">{forecast["safe_hours"]} <span style="font-size:16px;font-weight:400;">hr</span></div></div>'
+        f'<div style="flex:1;min-width:120px;"><div style="font-size:12px;color:#D97706;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Warning Window</div>'
+        f'<div style="font-size:32px;font-weight:800;color:#D97706;">{forecast["warning_hours"]} <span style="font-size:16px;font-weight:400;">hr</span></div></div>'
+        f'<div style="flex:1;min-width:120px;"><div style="font-size:12px;color:#DC2626;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Critical Window</div>'
+        f'<div style="font-size:32px;font-weight:800;color:#DC2626;">{forecast["critical_hours"]} <span style="font-size:16px;font-weight:400;">hr</span></div></div>'
         f'</div></div>',
         unsafe_allow_html=True
     )

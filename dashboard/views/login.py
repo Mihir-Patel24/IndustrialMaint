@@ -16,8 +16,8 @@ def render() -> None:
     .block-container      { padding: 2.5rem 1rem 2rem !important; max-width:100% !important; }
     [data-testid="stSidebar"] { display: none !important; }
 
-    /* Wrap the center column in a card look */
-    [data-testid="column"]:nth-child(2) > div:first-child > div:first-child {
+    /* Wrap the form container in a clean card look */
+    [data-testid="stForm"] {
       background:    rgba(255,255,255,0.98) !important;
       border-radius: 20px !important;
       padding:       36px 40px 32px !important;
@@ -25,95 +25,110 @@ def render() -> None:
       border:        1px solid rgba(255,255,255,0.70) !important;
     }
 
-    /* Labels readable on white card */
-    [data-testid="column"]:nth-child(2) label  { color:#374151 !important; font-size:13px !important; }
-    [data-testid="column"]:nth-child(2) p       { color:#6B7280 !important; }
+    /* Labels inside the white card */
+    [data-testid="stForm"] label,
+    [data-testid="stForm"] label p,
+    [data-testid="stForm"] [data-testid="stWidgetLabel"] p,
+    [data-testid="stForm"] [data-testid="stCheckbox"] label,
+    [data-testid="stForm"] [data-testid="stCheckbox"] label p {
+      color: #1F2937 !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+    }
 
-    /* Primary button — blue */
+    /* Primary form button — blue */
     .stFormSubmitButton > button {
       background:    #2563EB !important;
       border-color:  #2563EB !important;
       color:         #FFFFFF !important;
-      font-size:     14px   !important;
+      font-size:     15px   !important;
       font-weight:   600    !important;
       border-radius: 10px   !important;
-      height:        48px   !important;
+      height:        50px   !important;
       letter-spacing: 0.02em !important;
       box-shadow:    0 3px 12px rgba(37,99,235,0.30) !important;
+      width:         100% !important;
     }
     .stFormSubmitButton > button:hover {
       background:  #1D4ED8 !important;
       box-shadow:  0 5px 20px rgba(37,99,235,0.40) !important;
       transform:   translateY(-1px) !important;
     }
-    /* Secondary button */
+
+    /* Secondary buttons outside the card (Forgot Password, Register) */
     [data-testid="column"]:nth-child(2) .stButton > button {
       background:    transparent !important;
-      border:        1px solid #D1D5DB !important;
-      color:         #374151 !important;
+      border:        1px solid #4B5563 !important;
+      color:         #CBD5E1 !important;
       border-radius: 10px !important;
       height:        44px  !important;
+      width:         100% !important;
+      transition:    all 0.2s ease !important;
     }
     [data-testid="column"]:nth-child(2) .stButton > button:hover {
-      background:   #F9FAFB !important;
-      border-color: #2563EB !important;
-      color:        #2563EB !important;
+      background:   rgba(255,255,255,0.1) !important;
+      border-color: #FFFFFF !important;
+      color:        #FFFFFF !important;
     }
-    /* Input fields */
-    .stTextInput > div > div > input {
-      height:        44px    !important;
+
+    /* Input fields inside card */
+    .stTextInput input {
+      height:        46px    !important;
       border-radius: 10px    !important;
       border-color:  #D1D5DB !important;
-      font-size:     14px    !important;
+      font-size:     15px    !important;
       color:         #111827 !important;
       background:    #FFFFFF !important;
     }
-    .stTextInput > div > div > input:focus {
+    .stTextInput input:focus {
       border-color: #2563EB !important;
       box-shadow:   0 0 0 3px rgba(37,99,235,0.12) !important;
     }
-    /* Checkbox */
-    [data-testid="column"]:nth-child(2) .stCheckbox label { color:#374151 !important; font-size:12px !important; }
+
+    /* Checkbox inside card */
+    [data-testid="stForm"] [data-testid="stCheckbox"] label {
+      color: #374151 !important;
+      font-size: 13px !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-    # ── Header (above card) ──────────────────────────────────────
+    # ── Logo / Header (above card) ────────────────────────────────
     _, col, _ = st.columns([1, 1.1, 1])
     with col:
         st.markdown("""
         <div style="text-align:center;margin-bottom:28px">
           <div style="display:inline-flex;align-items:center;justify-content:center;
-               width:60px;height:60px;
+               width:64px;height:64px;
                background:linear-gradient(135deg,#1D4ED8,#3B82F6);
-               border-radius:16px;
+               border-radius:18px;
                box-shadow:0 8px 24px rgba(37,99,235,0.45);
-               margin-bottom:16px">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+               margin-bottom:18px">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
                 stroke="#fff" stroke-width="2.5" stroke-linecap="round"
                 stroke-linejoin="round"/>
             </svg>
           </div>
-          <div style="font-size:22px;font-weight:800;color:#F1F5F9;
+          <div style="font-size:24px;font-weight:800;color:#F1F5F9;
                letter-spacing:-0.02em;margin-bottom:6px">
             IndustrialMaint AI
           </div>
-          <div style="font-size:12px;color:#94A3B8;letter-spacing:0.04em">
+          <div style="font-size:12px;color:#94A3B8;letter-spacing:0.06em;font-weight:500">
             HYBRID AI PREDICTIVE MAINTENANCE PLATFORM
           </div>
         </div>
         """, unsafe_allow_html=True)
 
-    # ── Card column ──────────────────────────────────────────────
+    # ── Card column ───────────────────────────────────────────────
     _, col, _ = st.columns([1, 1.1, 1])
     with col:
-        # Title inside card
         st.markdown("""
-        <div style="margin-bottom:20px">
-          <div style="font-size:22px;font-weight:700;color:#0F172A;margin-bottom:4px">
+        <div style="margin-bottom:24px">
+          <div style="font-size:24px;font-weight:700;color:#FFFFFF;margin-bottom:6px">
             Welcome back
           </div>
-          <div style="font-size:13px;color:#6B7280">
+          <div style="font-size:14px;color:#CBD5E1">
             Sign in to your account to continue
           </div>
         </div>
@@ -124,28 +139,26 @@ def render() -> None:
         if err:
             st.markdown(
                 f'<div style="background:#FEF2F2;border:1px solid #FECACA;'
-                f'border-radius:8px;padding:10px 14px;margin-bottom:12px;'
-                f'font-size:13px;color:#B91C1C">⚠️ {err}</div>',
+                f'border-radius:8px;padding:12px 16px;margin-bottom:14px;'
+                f'font-size:14px;color:#B91C1C">⚠️ {err}</div>',
                 unsafe_allow_html=True,
             )
 
         # Demo badge
         if settings.demo_mode:
             st.markdown(
-                f'<div style="background:#EFF6FF;border:1px solid #BFDBFE;'
+                f'<div style="background:#F3F4F6;border:1px solid #E5E7EB;'
                 f'border-radius:8px;padding:10px 14px;margin-bottom:16px;'
-                f'font-size:12px;color:#1D4ED8">'
-                f'<b>✨ Demo Mode Active</b>'
-                f'&nbsp;—&nbsp;Email:&nbsp;'
-                f'<code style="background:#DBEAFE;padding:1px 6px;border-radius:4px">'
-                f'{settings.demo_email}</code>'
-                f'&nbsp;/&nbsp;Password:&nbsp;'
-                f'<code style="background:#DBEAFE;padding:1px 6px;border-radius:4px">'
-                f'{settings.demo_password}</code></div>',
+                f'font-size:13px;color:#374151">'
+                f'<b>✨ Demo Mode</b>&nbsp;—&nbsp;'
+                f'<code style="background:#E5E7EB;padding:1px 6px;border-radius:4px">{settings.demo_email}</code>'
+                f'&nbsp;/&nbsp;'
+                f'<code style="background:#E5E7EB;padding:1px 6px;border-radius:4px">{settings.demo_password}</code>'
+                f'</div>',
                 unsafe_allow_html=True,
             )
 
-        # ── Login form ───────────────────────────────────────────
+        # ── Login form ────────────────────────────────────────────
         with st.form("login_form"):
             email = st.text_input(
                 "Email address",
@@ -159,27 +172,23 @@ def render() -> None:
                 placeholder="••••••••",
                 key="login_pw",
             )
-            st.markdown('<div style="height:4px"></div>', unsafe_allow_html=True)
+            st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
 
             c_rem, _ = st.columns([1, 1])
             with c_rem:
                 st.checkbox("Remember me", key="login_remember")
 
-            st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
+            st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
             submitted = st.form_submit_button(
                 "Sign In →",
-                use_container_width=True,
+                width='stretch',
                 type="primary",
             )
 
-        # Forgot password link (must be outside the form)
+        # Forgot password link
         _, c_forg = st.columns([2, 1])
         with c_forg:
-            if st.button(
-                "Forgot password?",
-                key="btn_forgot_pw",
-                help="Reset your account password",
-            ):
+            if st.button("Forgot password?", key="btn_forgot_pw"):
                 st.session_state.auth_page = "forgot_password"
                 for k in ["_fp_step", "_fp_token_hint", "_fp_email"]:
                     st.session_state.pop(k, None)
@@ -199,12 +208,12 @@ def render() -> None:
         # Register link
         st.markdown(
             '<div style="text-align:center;margin-top:16px;margin-bottom:8px;'
-            'font-size:12px;color:#6B7280">Don\'t have an account?</div>',
+            'font-size:13px;color:#CBD5E1">Don\'t have an account?</div>',
             unsafe_allow_html=True,
         )
         if st.button(
             "Create Account →",
-            use_container_width=True,
+            width='stretch',
             type="secondary",
             key="go_register",
         ):
@@ -213,7 +222,7 @@ def render() -> None:
 
         # Footer
         st.markdown("""
-        <div style="text-align:center;margin-top:24px;font-size:11px;color:#9CA3AF">
+        <div style="text-align:center;margin-top:28px;font-size:12px;color:#9CA3AF">
           MIT VIT Research · IEEE Conference 2025 ·
           <span style="color:#3B82F6;font-weight:600">IndustrialMaint AI v3.0</span>
         </div>

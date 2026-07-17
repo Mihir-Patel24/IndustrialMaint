@@ -85,30 +85,30 @@ def render() -> None:
         g1, g2, g3 = st.columns(3)
         with g1:
             st.markdown(
-                '<div style="background:#FFFFFF;border:1px solid #E5E7EB;'
+                '<div style="background:var(--bg-card);border:1px solid var(--border);'
                 'border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">',
                 unsafe_allow_html=True,
             )
             fig = _gauge(mach_health, "Machine Health")
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
         with g2:
             st.markdown(
-                '<div style="background:#FFFFFF;border:1px solid #E5E7EB;'
+                '<div style="background:var(--bg-card);border:1px solid var(--border);'
                 'border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">',
                 unsafe_allow_html=True,
             )
             fig = _gauge(tool_health, "Tool Health")
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
         with g3:
             st.markdown(
-                '<div style="background:#FFFFFF;border:1px solid #E5E7EB;'
+                '<div style="background:var(--bg-card);border:1px solid var(--border);'
                 'border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">',
                 unsafe_allow_html=True,
             )
             fig = _gauge(fail_prob, "Failure Risk", invert=True)
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
 
     with col_a:
@@ -181,14 +181,14 @@ def render() -> None:
         ]
         rows_html = "".join(
             f'<div style="display:flex;justify-content:space-between;'
-            f'padding:8px 0;border-bottom:1px solid #F3F4F6">'
-            f'<span style="font-size:12px;color:#6B7280">{label}</span>'
-            f'<span style="font-size:12px;font-weight:600;color:#111827">{val}</span>'
+            f'padding:8px 0;border-bottom:1px solid var(--border)">'
+            f'<span style="font-size:12px;color:var(--text-secondary)">{label}</span>'
+            f'<span style="font-size:12px;font-weight:600;color:var(--text-primary)">{val}</span>'
             f'</div>'
             for label, val in detail_rows
         )
         st.markdown(
-            f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+            f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
             f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">{rows_html}</div>',
             unsafe_allow_html=True,
         )

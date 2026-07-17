@@ -29,23 +29,46 @@ except Exception:
     smtp_ok    = lambda: False
     send_alert_email = None
 
-_LEVEL_META = {
-    "critical": {
-        "icon": "🔴", "label": "Critical",
-        "bg": "#FEF2F2", "border": "#FECACA", "color": "#DC2626",
-        "bar": "#DC2626",
-    },
-    "warning": {
-        "icon": "🟡", "label": "Warning",
-        "bg": "#FFFBEB", "border": "#FDE68A", "color": "#D97706",
-        "bar": "#D97706",
-    },
-    "info": {
-        "icon": "🔵", "label": "Info",
-        "bg": "#EFF6FF", "border": "#BFDBFE", "color": "#2563EB",
-        "bar": "#2563EB",
-    },
-}
+def get_level_meta(level: str) -> dict:
+    lvl = level.lower()
+    is_dark = st.session_state.get("dark_mode", False)
+    if is_dark:
+        meta = {
+            "critical": {
+                "icon": "🔴", "label": "Critical",
+                "bg": "#450A0A", "border": "#7F1D1D", "color": "#F87171",
+                "bar": "#EF4444",
+            },
+            "warning": {
+                "icon": "🟡", "label": "Warning",
+                "bg": "#451A03", "border": "#78350F", "color": "#FBBF24",
+                "bar": "#F59E0B",
+            },
+            "info": {
+                "icon": "🔵", "label": "Info",
+                "bg": "#0F172A", "border": "#1E293B", "color": "#60A5FA",
+                "bar": "#3B82F6",
+            },
+        }
+    else:
+        meta = {
+            "critical": {
+                "icon": "🔴", "label": "Critical",
+                "bg": "#FEF2F2", "border": "#FECACA", "color": "#DC2626",
+                "bar": "#DC2626",
+            },
+            "warning": {
+                "icon": "🟡", "label": "Warning",
+                "bg": "#FFFBEB", "border": "#FDE68A", "color": "#D97706",
+                "bar": "#D97706",
+            },
+            "info": {
+                "icon": "🔵", "label": "Info",
+                "bg": "#EFF6FF", "border": "#BFDBFE", "color": "#2563EB",
+                "bar": "#2563EB",
+            },
+        }
+    return meta.get(lvl, meta["info"])
 
 
 def _fmt_ts(ts: str) -> str:
@@ -59,7 +82,7 @@ def _fmt_ts(ts: str) -> str:
 
 def _alert_card(alert: dict, idx: int, can_mark: bool) -> None:
     level    = (alert.get("level") or "info").lower()
-    meta     = _LEVEL_META.get(level, _LEVEL_META["info"])
+    meta     = get_level_meta(level)
     title    = alert.get("title", "Untitled Alert")
     detail   = alert.get("detail", "")
     machine  = alert.get("machine_id", "")
@@ -84,7 +107,7 @@ def _alert_card(alert: dict, idx: int, can_mark: bool) -> None:
 
             f'<div style="display:flex;justify-content:space-between;'
             f'align-items:flex-start;gap:8px;margin-bottom:6px">'
-            f'<div style="font-size:14px;font-weight:{font_w};color:#0F172A">'
+            f'<div style="font-size:14px;font-weight:{font_w};color:var(--text-primary)">'
             f'{unread_dot}{title}</div>'
             f'<span style="background:{meta["bg"]};color:{meta["color"]};'
             f'border:1px solid {meta["border"]};border-radius:20px;'
@@ -92,10 +115,10 @@ def _alert_card(alert: dict, idx: int, can_mark: bool) -> None:
             f'{meta["label"]}</span>'
             f'</div>'
 
-            f'<div style="font-size:13px;color:#374151;margin-bottom:8px">'
+            f'<div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">'
             f'{detail or "No additional details."}</div>'
 
-            f'<div style="display:flex;gap:16px;font-size:11px;color:#94A3B8">'
+            f'<div style="display:flex;gap:16px;font-size:11px;color:var(--text-secondary)">'
             + (f'<span>🏭 {machine}</span>' if machine else "")
             + f'<span>🕒 {ts}</span>'
             f'<span>{"✅ Read" if is_read else "🔔 Unread"}</span>'
@@ -105,7 +128,7 @@ def _alert_card(alert: dict, idx: int, can_mark: bool) -> None:
 
         if can_mark and not is_read and alert_id and db is not None:
             spacer(4)
-            if st.button("Mark as Read", key=f"mark_{alert_id}_{idx}", use_container_width=False):
+            if st.button("Mark as Read", key=f"mark_{alert_id}_{idx}", width='content'):
                 try:
                     db.mark_alert_read(alert_id)
                     st.rerun()
@@ -188,7 +211,7 @@ def render() -> None:
     with fa3:
         mark_all_btn = st.button(
             "✅ Mark All Read", key="ac_mark_all",
-            use_container_width=True, type="secondary",
+            width='stretch', type="secondary",
         )
 
     if mark_all_btn and db is not None and uid:
@@ -215,10 +238,10 @@ def render() -> None:
 
     if not filtered:
         st.markdown(
-            '<div style="background:#F8FAFC;border:1px solid #E2E8F0;'
-            'border-radius:12px;padding:40px;text-align:center;color:#94A3B8">'
+            '<div style="background:var(--bg-card);border:1px solid var(--border);'
+            'border-radius:12px;padding:40px;text-align:center;color:var(--text-secondary)">'
             '<div style="font-size:32px;margin-bottom:8px">🔔</div>'
-            '<div style="font-size:15px;font-weight:600;color:#64748B">'
+            '<div style="font-size:15px;font-weight:600;color:var(--text-secondary)">'
             'No alerts match your filters.</div>'
             '</div>',
             unsafe_allow_html=True,
@@ -232,7 +255,7 @@ def render() -> None:
     # ── Email / Notifications config ──────────────────────────────
     section_title("Notification Settings")
     st.markdown(
-        '<div style="background:#fff;border:1px solid #E2E8F0;'
+        '<div style="background:var(--bg-card);border:1px solid var(--border);'
         'border-radius:12px;padding:22px 24px">',
         unsafe_allow_html=True,
     )
@@ -245,7 +268,7 @@ def render() -> None:
         f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
         f'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;'
         f'background:{smtp_status_color}"></span>'
-        f'<span style="font-size:14px;font-weight:600;color:#0F172A">Email Notifications</span>'
+        f'<span style="font-size:14px;font-weight:600;color:var(--text-primary)">Email Notifications</span>'
         f'<span style="font-size:12px;color:{smtp_status_color};font-weight:600">'
         f'({smtp_status_label})</span>'
         f'</div>',
@@ -279,9 +302,13 @@ def render() -> None:
     spacer(10)
 
     if not smtp_configured:
+        if st.session_state.dark_mode:
+            bg_smtp, border_smtp, text_smtp = "#451A03", "#78350F", "#FBBF24"
+        else:
+            bg_smtp, border_smtp, text_smtp = "#FFF7ED", "#FED7AA", "#92400E"
         st.markdown(
-            '<div style="background:#FFF7ED;border:1px solid #FED7AA;'
-            'border-radius:8px;padding:12px 16px;font-size:13px;color:#92400E">'
+            f'<div style="background:{bg_smtp};border:1px solid {border_smtp};'
+            f'border-radius:8px;padding:12px 16px;font-size:13px;color:{text_smtp}">'
             '<b>SMTP not configured.</b> To enable email alerts, set these environment variables:<br>'
             '<code style="font-size:12px">SMTP_HOST · SMTP_PORT · SMTP_USER · SMTP_PASSWORD · ALERT_EMAIL</code>'
             '</div>',
@@ -290,7 +317,7 @@ def render() -> None:
     else:
         test_col, _ = st.columns([1, 2])
         with test_col:
-            if st.button("📧 Send Test Email", key="notif_test_email", use_container_width=True):
+            if st.button("📧 Send Test Email", key="notif_test_email", width='stretch'):
                 if send_alert_email is not None:
                     ok = send_alert_email(
                         "Test Alert — IndustrialMaint",
@@ -330,7 +357,7 @@ def render() -> None:
                           "Time": str(r[2])[:16].replace("T", " ")}
                          for r in rows]
                     )
-                    st.dataframe(audit_df, use_container_width=True,
+                    st.dataframe(audit_df, width='stretch',
                                  hide_index=True, height=280)
                 else:
                     st.info("No audit log entries yet.")

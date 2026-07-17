@@ -21,7 +21,7 @@ _WHITE  = "#ffffff"
 _GREEN  = "#16a34a"
 _AMBER  = "#d97706"
 _RED    = "#dc2626"
-_BLUE   = "#2563eb"
+_BLUE   = "#111827"
 
 _UPCOMING = [
     {"machine": "CNC-03", "task": "Tool Replacement",    "due": "Today",      "priority": "Immediate", "est_time": "45 min",  "tech": "J. Smith"},

@@ -24,22 +24,72 @@ def render() -> None:
     }
     .block-container      { padding: 2.5rem 1rem 2rem !important; max-width:100% !important; }
     [data-testid="stSidebar"] { display: none !important; }
+
+    /* Wrap the form container in a clean card look */
+    [data-testid="stForm"] {
+      background:    rgba(255,255,255,0.98) !important;
+      border-radius: 20px !important;
+      padding:       36px 40px 32px !important;
+      box-shadow:    0 24px 64px rgba(0,0,0,0.40), 0 4px 16px rgba(0,0,0,0.12) !important;
+      border:        1px solid rgba(255,255,255,0.70) !important;
+    }
+
+    /* Labels inside card */
+    [data-testid="stForm"] label,
+    [data-testid="stForm"] label p,
+    [data-testid="stForm"] [data-testid="stWidgetLabel"] p {
+      color: #1F2937 !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+    }
+
+    /* Input fields inside card */
+    .stTextInput input {
+      height:        46px    !important;
+      border-radius: 10px    !important;
+      border-color:  #D1D5DB !important;
+      font-size:     15px    !important;
+      color:         #111827 !important;
+      background:    #FFFFFF !important;
+    }
+    .stTextInput input:focus {
+      border-color: #2563EB !important;
+      box-shadow:   0 0 0 3px rgba(37,99,235,0.12) !important;
+    }
+
+    /* Primary form button — blue */
     .stFormSubmitButton > button {
       background:    #2563EB !important;
       border-color:  #2563EB !important;
       color:         #FFFFFF !important;
+      font-size:     15px   !important;
       font-weight:   600    !important;
       border-radius: 10px   !important;
-      height:        46px   !important;
+      height:        50px   !important;
+      letter-spacing: 0.02em !important;
+      box-shadow:    0 3px 12px rgba(37,99,235,0.30) !important;
+      width:         100% !important;
     }
     .stFormSubmitButton > button:hover {
-      background: #1D4ED8 !important;
+      background:  #1D4ED8 !important;
+      box-shadow:  0 5px 20px rgba(37,99,235,0.40) !important;
+      transform:   translateY(-1px) !important;
     }
-    .stTextInput > div > div > input {
+
+    /* Secondary buttons outside card */
+    [data-testid="column"]:nth-child(2) .stButton > button {
+      background:    transparent !important;
+      border:        1px solid #4B5563 !important;
+      color:         #CBD5E1 !important;
       border-radius: 10px !important;
-      border-color:  #D1D5DB !important;
-      height:        44px   !important;
-      font-size:     14px   !important;
+      height:        44px  !important;
+      width:         100% !important;
+      transition:    all 0.2s ease !important;
+    }
+    [data-testid="column"]:nth-child(2) .stButton > button:hover {
+      background:   rgba(255,255,255,0.1) !important;
+      border-color: #FFFFFF !important;
+      color:        #FFFFFF !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -81,15 +131,12 @@ def render() -> None:
         # ── STEP 1: Enter email ───────────────────────────────────
         if step == 1:
             st.markdown("""
-            <div style="background:rgba(255,255,255,0.97);border-radius:18px;
-                 padding:32px 36px 28px;
-                 box-shadow:0 20px 56px rgba(0,0,0,0.38)">
-              <div style="font-size:18px;font-weight:700;color:#0F172A;margin-bottom:4px">
+            <div style="margin-bottom:24px">
+              <div style="font-size:24px;font-weight:700;color:#FFFFFF;margin-bottom:6px">
                 Forgot your password?
               </div>
-              <div style="font-size:13px;color:#6B7280;margin-bottom:20px">
-                Enter your registered email address.
-                We will generate a reset token for you.
+              <div style="font-size:14px;color:#CBD5E1">
+                Enter your registered email address. We will generate a reset token for you.
               </div>
             </div>
             """, unsafe_allow_html=True)
@@ -103,7 +150,7 @@ def render() -> None:
                 st.markdown('<div style="height:6px"></div>', unsafe_allow_html=True)
                 submitted = st.form_submit_button(
                     "Send Reset Link →",
-                    use_container_width=True,
+                    width='stretch',
                     type="primary",
                 )
 
@@ -131,13 +178,11 @@ def render() -> None:
             token_hint = st.session_state.get("_fp_token_hint", "")
 
             st.markdown("""
-            <div style="background:rgba(255,255,255,0.97);border-radius:18px;
-                 padding:32px 36px 28px;
-                 box-shadow:0 20px 56px rgba(0,0,0,0.38)">
-              <div style="font-size:18px;font-weight:700;color:#0F172A;margin-bottom:4px">
+            <div style="margin-bottom:24px">
+              <div style="font-size:24px;font-weight:700;color:#FFFFFF;margin-bottom:6px">
                 Enter your reset token
               </div>
-              <div style="font-size:13px;color:#6B7280;margin-bottom:16px">
+              <div style="font-size:14px;color:#CBD5E1">
                 Paste the token from your email and choose a new password.
               </div>
             </div>
@@ -192,7 +237,7 @@ def render() -> None:
                 st.markdown('<div style="height:6px"></div>', unsafe_allow_html=True)
                 submitted = st.form_submit_button(
                     "Reset Password →",
-                    use_container_width=True,
+                    width='stretch',
                     type="primary",
                 )
 
@@ -231,10 +276,10 @@ def render() -> None:
         # ── Back to login ─────────────────────────────────────────
         st.markdown(
             '<div style="text-align:center;margin-top:16px;margin-bottom:8px;'
-            'font-size:12px;color:#6B7280">Remember your password?</div>',
+            'font-size:12px;color:#CBD5E1">Remember your password?</div>',
             unsafe_allow_html=True,
         )
-        if st.button("← Back to Sign In", use_container_width=True, key="fp_back"):
+        if st.button("← Back to Sign In", width='stretch', key="fp_back"):
             for k in ["_fp_step", "_fp_token_hint", "_fp_email"]:
                 st.session_state.pop(k, None)
             st.session_state.auth_page = "login"

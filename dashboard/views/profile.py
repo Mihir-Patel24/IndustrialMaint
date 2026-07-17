@@ -23,7 +23,7 @@ def render() -> None:
     factory   = user.get("factory",      "—")
     dept      = user.get("department",   "—")
     role      = user.get("role",         "Maintenance Engineer")
-    av_color  = user.get("avatar_color", "#1d4ed8")
+    av_color  = user.get("avatar_color", "#111827")
     initials  = auth.user_initials()
     created   = user.get("created_at",  "")[:10] if user.get("created_at") else "—"
     last_login= user.get("last_login",  "")[:10] if user.get("last_login") else "Today"
@@ -43,7 +43,7 @@ def render() -> None:
 
     with c_card:
         st.markdown(
-            f'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;'
+            f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;'
             f'padding:28px 28px;box-shadow:0 2px 8px rgba(0,0,0,0.06)">'
             f'<div style="display:flex;align-items:center;gap:20px;margin-bottom:24px">'
             f'<div class="profile-avatar" style="background:{av_color};'
@@ -52,23 +52,23 @@ def render() -> None:
             f'align-items:center;justify-content:center;'
             f'box-shadow:0 4px 14px rgba(0,0,0,0.15)">{initials}</div>'
             f'<div>'
-            f'<div style="font-size:1.2rem;font-weight:800;color:#0f172a">{name}</div>'
-            f'<div style="font-size:0.78rem;color:#64748b;margin-top:2px">{email}</div>'
+            f'<div style="font-size:1.2rem;font-weight:800;color:var(--text-primary)">{name}</div>'
+            f'<div style="font-size:0.78rem;color:var(--text-secondary);margin-top:2px">{email}</div>'
             f'<div style="margin-top:8px">{status_badge(role)}</div>'
             f'</div></div>'
             f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
-            f'<div><div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;'
+            f'<div><div style="font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Company</div>'
-            f'<div style="font-size:0.84rem;font-weight:600;color:#0f172a">{company}</div></div>'
-            f'<div><div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;'
+            f'<div style="font-size:0.84rem;font-weight:600;color:var(--text-primary)">{company}</div></div>'
+            f'<div><div style="font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Factory</div>'
-            f'<div style="font-size:0.84rem;font-weight:600;color:#0f172a">{factory}</div></div>'
-            f'<div><div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;'
+            f'<div style="font-size:0.84rem;font-weight:600;color:var(--text-primary)">{factory}</div></div>'
+            f'<div><div style="font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Department</div>'
-            f'<div style="font-size:0.84rem;font-weight:600;color:#0f172a">{dept}</div></div>'
-            f'<div><div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;'
+            f'<div style="font-size:0.84rem;font-weight:600;color:var(--text-primary)">{dept}</div></div>'
+            f'<div><div style="font-size:0.65rem;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Member Since</div>'
-            f'<div style="font-size:0.84rem;font-weight:600;color:#0f172a">{created}</div></div>'
+            f'<div style="font-size:0.84rem;font-weight:600;color:var(--text-primary)">{created}</div></div>'
             f'</div></div>',
             unsafe_allow_html=True,
         )
@@ -77,7 +77,7 @@ def render() -> None:
         # Stats row
         s1, s2, s3, s4 = st.columns(4)
         for col, label, value, icon, color in [
-            (s1, "Predictions", str(pred_count), "🔮", "#1d4ed8"),
+            (s1, "Predictions", str(pred_count), "🔮", "#111827"),
             (s2, "Machines",    str(len(machines)), "🏭", "#059669"),
             (s3, "Last Login",  last_login, "🕐", "#7c3aed"),
             (s4, "Reports",     str(max(pred_count // 3, 0)), "📋", "#d97706"),
@@ -100,7 +100,7 @@ def render() -> None:
         fig = go.Figure()
         fig.add_trace(go.Bar(
             x=days, y=counts_mock,
-            marker_color=["#1d4ed8" if i == 6 else "#bfdbfe" for i in range(7)],
+            marker_color=["#111827" if i == 6 else "#bfdbfe" for i in range(7)],
             text=counts_mock, textposition="outside",
             textfont=dict(size=10, color="#475569"),
         ))
@@ -113,7 +113,7 @@ def render() -> None:
             yaxis=dict(showgrid=True, gridcolor="#f1f5f9", zeroline=False),
             showlegend=False,
         )
-        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
 
     spacer(16)
 
@@ -123,7 +123,7 @@ def render() -> None:
     with col_edit:
         st.markdown('<div class="section-title">EDIT PROFILE</div>', unsafe_allow_html=True)
         st.markdown(
-            '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;'
+            '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;'
             'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">',
             unsafe_allow_html=True,
         )
@@ -140,7 +140,7 @@ def render() -> None:
                       if role in ["Maintenance Engineer","Machine Operator",
                                   "Plant Manager","Admin","Researcher"] else 0,
             key="pf_role")
-            if st.form_submit_button("Save Changes", type="primary", use_container_width=True):
+            if st.form_submit_button("Save Changes", type="primary", width='stretch'):
                 try:
                     db.update_user_profile(
                         uid, full_name=new_name, company=new_company,
@@ -159,7 +159,7 @@ def render() -> None:
     with col_machines:
         st.markdown('<div class="section-title">RECENT PREDICTIONS</div>', unsafe_allow_html=True)
         st.markdown(
-            '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;'
+            '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;'
             'padding:0;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden">',
             unsafe_allow_html=True,
         )
@@ -178,10 +178,10 @@ def render() -> None:
                 ts     = str(h.get("created_at",""))[:10]
                 rc     = "#dc2626" if risk >= 60 else "#d97706" if risk >= 30 else "#059669"
                 st.markdown(
-                    f'<tr><td style="font-weight:600;color:#0f172a">{mach}</td>'
+                    f'<tr><td style="font-weight:600;color:var(--text-primary)">{mach}</td>'
                     f'<td>{status_badge(status)}</td>'
                     f'<td style="font-weight:700;color:{rc}">{risk:.0f}%</td>'
-                    f'<td style="color:#94a3b8;font-size:0.72rem">{ts}</td></tr>',
+                    f'<td style="color:var(--text-secondary);font-size:0.72rem">{ts}</td></tr>',
                     unsafe_allow_html=True,
                 )
         else:
@@ -192,15 +192,15 @@ def render() -> None:
                 ts     = str(p.get("metadata", {}).get("prediction_time", "—"))[:10]
                 rc     = "#dc2626" if risk >= 60 else "#d97706" if risk >= 30 else "#059669"
                 st.markdown(
-                    f'<tr><td style="font-weight:600;color:#0f172a">Session</td>'
+                    f'<tr><td style="font-weight:600;color:var(--text-primary)">Session</td>'
                     f'<td>{status_badge(status)}</td>'
                     f'<td style="font-weight:700;color:{rc}">{risk:.0f}%</td>'
-                    f'<td style="color:#94a3b8;font-size:0.72rem">{ts}</td></tr>',
+                    f'<td style="color:var(--text-secondary);font-size:0.72rem">{ts}</td></tr>',
                     unsafe_allow_html=True,
                 )
             if not st.session_state.get("prediction_history"):
                 st.markdown(
-                    '<tr><td colspan="4" style="text-align:center;color:#94a3b8;'
+                    '<tr><td colspan="4" style="text-align:center;color:var(--text-secondary);'
                     'padding:24px;font-size:0.78rem">No predictions yet. '
                     'Go to Predictions to run your first analysis.</td></tr>',
                     unsafe_allow_html=True,
@@ -215,7 +215,7 @@ def render() -> None:
     with col_pw:
         section_title("Change Password")
         st.markdown(
-            '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;'
+            '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
             'padding:22px 22px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">',
             unsafe_allow_html=True,
         )
@@ -250,7 +250,7 @@ def render() -> None:
                     )
 
                 submitted_pw = st.form_submit_button(
-                    "Update Password", type="primary", use_container_width=True
+                    "Update Password", type="primary", width='stretch'
                 )
 
             if submitted_pw:
@@ -279,40 +279,40 @@ def render() -> None:
         section_title("Account & Security")
         role_meta = ROLE_META.get(role, ROLE_META["Operator"])
         st.markdown(
-            f'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;'
+            f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
             f'padding:22px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">'
 
             # Role
             f'<div style="margin-bottom:18px">'
-            f'<div style="font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;'
+            f'<div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:6px">Access Level</div>'
             f'{role_badge_html(role)}</div>'
 
             # Permissions summary
             f'<div style="margin-bottom:18px">'
-            f'<div style="font-size:11px;font-weight:600;color:#9CA3AF;text-transform:uppercase;'
+            f'<div style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:6px">Role Description</div>'
-            f'<div style="font-size:13px;color:#374151">{role_meta["desc"]}</div></div>'
+            f'<div style="font-size:13px;color:var(--text-primary)">{role_meta["desc"]}</div></div>'
 
             # Account info grid
             f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;'
-            f'border-top:1px solid #F3F4F6;padding-top:16px">'
+            f'border-top:1px solid var(--border);padding-top:16px">'
 
-            f'<div><div style="font-size:11px;color:#9CA3AF;text-transform:uppercase;'
+            f'<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Account Created</div>'
-            f'<div style="font-size:13px;font-weight:600;color:#111827">{created}</div></div>'
+            f'<div style="font-size:13px;font-weight:600;color:var(--text-primary)">{created}</div></div>'
 
-            f'<div><div style="font-size:11px;color:#9CA3AF;text-transform:uppercase;'
+            f'<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Last Login</div>'
-            f'<div style="font-size:13px;font-weight:600;color:#111827">{last_login}</div></div>'
+            f'<div style="font-size:13px;font-weight:600;color:var(--text-primary)">{last_login}</div></div>'
 
-            f'<div><div style="font-size:11px;color:#9CA3AF;text-transform:uppercase;'
+            f'<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Session Timeout</div>'
-            f'<div style="font-size:13px;font-weight:600;color:#111827">24 hours</div></div>'
+            f'<div style="font-size:13px;font-weight:600;color:var(--text-primary)">24 hours</div></div>'
 
-            f'<div><div style="font-size:11px;color:#9CA3AF;text-transform:uppercase;'
+            f'<div><div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;'
             f'letter-spacing:.06em;margin-bottom:3px">Auth Mode</div>'
-            f'<div style="font-size:13px;font-weight:600;color:#111827">'
+            f'<div style="font-size:13px;font-weight:600;color:var(--text-primary)">'
             f'{"Supabase" if __import__("config.settings", fromlist=["settings"]).settings.is_supabase_configured else "Local SQLite"}'
             f'</div></div>'
 

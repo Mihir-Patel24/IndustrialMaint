@@ -12,6 +12,7 @@ from components import (
     kpi_card, health_kpi_card, risk_kpi_card, gauge_card,
     alert_card, recommendation_card, spacer, status_badge,
     priority_badge, risk_breakdown_bars, fusion_flow, shap_panel,
+    section_title,
 )
 from api_client import predict, parse_prediction
 from auth.auth_service import auth
@@ -21,15 +22,15 @@ try:
 except Exception:
     db = None
 
-_SLATE  = "#1e293b"
-_GRAY   = "#64748b"
-_LGRAY  = "#94a3b8"
-_BORDER = "#e2e8f0"
-_WHITE  = "#ffffff"
+_SLATE  = "var(--text-primary)"
+_GRAY   = "var(--text-secondary)"
+_LGRAY  = "var(--text-secondary)"
+_BORDER = "var(--border)"
+_WHITE  = "var(--bg-card)"
 _GREEN  = "#16a34a"
 _AMBER  = "#d97706"
 _RED    = "#dc2626"
-_BLUE   = "#2563eb"
+_BLUE   = "var(--text-primary)"
 
 
 def _run_prediction(op_input: dict) -> dict:
@@ -207,7 +208,7 @@ def _result_panel(pred: dict) -> None:
             yaxis=dict(title="Wear (mm)", showgrid=True, gridcolor="#f1f5f9"),
             legend=dict(orientation="h", y=1.15, x=0, font=dict(size=10)),
         )
-        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
 
     with col_rul:
         rul_cycles = np.linspace(0, 80, 30)
@@ -228,7 +229,7 @@ def _result_panel(pred: dict) -> None:
             xaxis=dict(title="Time (min)", showgrid=True, gridcolor="#f1f5f9"),
             yaxis=dict(title="Wear (mm)", showgrid=True, gridcolor="#f1f5f9"),
         )
-        st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
+        st.plotly_chart(fig2, width='stretch', config={"displayModeBar": False})
 
     spacer(8)
 
@@ -301,19 +302,19 @@ def render():
         ),
     }
     with sq1:
-        if st.button("✅ Sample: Healthy", use_container_width=True, key="s_healthy"):
+        if st.button("✅ Sample: Healthy", width='stretch', key="s_healthy"):
             st.session_state._sample_fill = "healthy"
             st.rerun()
     with sq2:
-        if st.button("⚠️ Sample: Warning", use_container_width=True, key="s_warning"):
+        if st.button("⚠️ Sample: Warning", width='stretch', key="s_warning"):
             st.session_state._sample_fill = "warning"
             st.rerun()
     with sq3:
-        if st.button("🔴 Sample: Critical", use_container_width=True, key="s_critical"):
+        if st.button("🔴 Sample: Critical", width='stretch', key="s_critical"):
             st.session_state._sample_fill = "critical"
             st.rerun()
     with sq4:
-        if st.button("🔄 Clear Sample", use_container_width=True, key="s_clear"):
+        if st.button("🔄 Clear Sample", width='stretch', key="s_clear"):
             st.session_state.pop("_sample_fill", None)
             st.rerun()
 
@@ -322,9 +323,12 @@ def render():
 
     # ── Manual Entry Form ─────────────────────────────────────────
     section_title("Machine Parameters")
+    bg_info = "#0F172A" if st.session_state.dark_mode else "#eff6ff"
+    border_info = "#1E293B" if st.session_state.dark_mode else "#bfdbfe"
+    color_info = "#60A5FA" if st.session_state.dark_mode else "#111827"
     st.markdown(
-        f'<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;'
-        f'padding:8px 14px;font-size:0.76rem;color:#1d4ed8;margin-bottom:12px">'
+        f'<div style="background:{bg_info};border:1px solid {border_info};border-radius:6px;'
+        f'padding:8px 14px;font-size:0.76rem;color:{color_info};margin-bottom:12px">'
         f'Enter manufacturing parameters. All sensor features are automatically calculated.</div>',
         unsafe_allow_html=True,
     )
@@ -334,7 +338,7 @@ def render():
 
         with col_a:
             st.markdown(
-                '<div style="font-size:11px;font-weight:600;color:#9CA3AF;'
+                '<div style="font-size:11px;font-weight:600;color:var(--text-secondary);'
                 'text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">'
                 '🏭 Machine Information</div>',
                 unsafe_allow_html=True,
@@ -407,13 +411,13 @@ def render():
         b1, b2, b3, b4 = st.columns([2, 1, 1, 1])
         with b1:
             submitted = st.form_submit_button(
-                "🔮  Analyze Machine", use_container_width=True, type="primary")
+                "🔮  Analyze Machine", width='stretch', type="primary")
         with b2:
-            reset = st.form_submit_button("🔄  Reset", use_container_width=True)
+            reset = st.form_submit_button("🔄  Reset", width='stretch')
         with b3:
-            st.form_submit_button("💾  Save Input", use_container_width=True)
+            st.form_submit_button("💾  Save Input", width='stretch')
         with b4:
-            st.form_submit_button("📄  PDF Report", use_container_width=True)
+            st.form_submit_button("📄  PDF Report", width='stretch')
 
     if submitted:
         mtype_map = {"M — Medium": "M", "L — Light": "L", "H — Heavy": "H"}
@@ -535,14 +539,14 @@ def _csv_upload_section():
         st.session_state.uploaded_df = df
         st.markdown(f'<div style="font-size:0.78rem;color:{_GREEN};margin-top:8px">Loaded {len(df)} rows.</div>',
                     unsafe_allow_html=True)
-        st.dataframe(df.head(10), use_container_width=True, hide_index=True)
+        st.dataframe(df.head(10), width='stretch', hide_index=True)
 
         if st.button("Run Batch Prediction", type="primary"):
             from api_client import predict_batch
             with st.spinner("Running batch prediction..."):
                 result_df = predict_batch(df)
             st.success(f"Batch prediction complete — {len(result_df)} rows processed.")
-            st.dataframe(result_df, use_container_width=True, hide_index=True)
+            st.dataframe(result_df, width='stretch', hide_index=True)
             csv_bytes = result_df.to_csv(index=False).encode("utf-8")
             st.download_button("Download Results CSV", csv_bytes,
                                f"batch_results_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",

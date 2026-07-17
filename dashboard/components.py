@@ -39,10 +39,10 @@ def section_header(title: str, subtitle: str = "") -> None:
     """Page-level section header with optional subtitle."""
     sub_html = ""
     if subtitle:
-        sub_html = f'<div style="font-size:13px;color:#6B7280;margin-top:3px">{subtitle}</div>'
+        sub_html = f'<div style="font-size:15px;color:#6B7280;margin-top:3px">{subtitle}</div>'
     st.markdown(
         f'<div style="margin-bottom:20px">'
-        f'<div style="font-size:20px;font-weight:600;color:#111827">{title}</div>'
+        f'<div style="font-size:24px;font-weight:600;color:#111827">{title}</div>'
         f'{sub_html}</div>',
         unsafe_allow_html=True,
     )
@@ -51,8 +51,8 @@ def section_header(title: str, subtitle: str = "") -> None:
 def section_title(text: str) -> None:
     """Renders an uppercase section label. No background."""
     st.markdown(
-        f'<div style="font-size:11px;font-weight:600;letter-spacing:0.08em;'
-        f'text-transform:uppercase;color:#9CA3AF;margin:0 0 14px 0">'
+        f'<div style="font-size:13px;font-weight:600;letter-spacing:0.08em;'
+        f'text-transform:uppercase;color:var(--text-secondary);margin:0 0 14px 0">'
         f'{text}</div>',
         unsafe_allow_html=True,
     )
@@ -66,16 +66,16 @@ def cost_impact_card(label: str, value: str, subtitle: str = "",
     border = "#BBF7D0" if positive else "#FECACA"
     arrow  = "▲" if positive else "▼"
     sub_html = (
-        f'<div style="font-size:11px;color:#6B7280;margin-top:4px">{subtitle}</div>'
+        f'<div style="font-size:13px;color:#6B7280;margin-top:4px">{subtitle}</div>'
         if subtitle else ""
     )
     st.markdown(
         f'<div style="background:{bg};border:1px solid {border};border-radius:12px;'
         f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        f'<div style="font-size:11px;font-weight:600;letter-spacing:0.07em;'
-        f'text-transform:uppercase;color:#9CA3AF;margin-bottom:10px">{label}</div>'
-        f'<div style="font-size:26px;font-weight:700;color:{col};line-height:1.1">'
-        f'<span style="font-size:14px;margin-right:3px">{arrow}</span>{value}</div>'
+        f'<div style="font-size:13px;font-weight:600;letter-spacing:0.07em;'
+        f'text-transform:uppercase;color:var(--text-secondary);margin-bottom:10px">{label}</div>'
+        f'<div style="font-size:30px;font-weight:700;color:{col};line-height:1.1">'
+        f'<span style="font-size:16px;margin-right:3px">{arrow}</span>{value}</div>'
         f'{sub_html}</div>',
         unsafe_allow_html=True,
     )
@@ -92,7 +92,7 @@ def status_badge(status: str, size: str = "sm") -> str:
     elif "healthy" in sl or "good" in sl or "ok" in sl:
         bg, col = "#F0FDF4", "#15803D"
     elif "medium" in sl:
-        bg, col = "#EFF6FF", "#1D4ED8"
+        bg, col = "#EFF6FF", "#111827"
     else:
         bg, col = "#F3F4F6", "#374151"
 
@@ -112,13 +112,13 @@ def priority_badge(priority: str) -> str:
     elif "high" in pl:
         bg, col, dot = "#FFFBEB", "#92400E", "#F59E0B"
     elif "medium" in pl or "mid" in pl:
-        bg, col, dot = "#EFF6FF", "#1D4ED8", "#2563EB"
+        bg, col, dot = "#EFF6FF", "#111827", "#111827"
     else:
         bg, col, dot = "#F0FDF4", "#15803D", "#16A34A"
 
     return (
         f'<span style="display:inline-flex;align-items:center;gap:5px;'
-        f'background:{bg};color:{col};font-size:11px;font-weight:600;'
+        f'background:{bg};color:{col};font-size:13px;font-weight:600;'
         f'padding:3px 10px;border-radius:20px">'
         f'<span style="width:6px;height:6px;border-radius:50%;'
         f'background:{dot};flex-shrink:0"></span>{priority}</span>'
@@ -133,20 +133,21 @@ def kpi_card(label: str, value: str, unit: str = "",
         is_pos = delta.startswith("+")
         dcol = "#16A34A" if is_pos else "#DC2626"
         delta_html = (
-            f'<div style="font-size:11px;color:{dcol};font-weight:500;'
+            f'<div style="font-size:13px;color:{dcol};font-weight:500;'
             f'margin-top:4px">{delta}</div>'
         )
     unit_html = ""
     if unit:
-        unit_html = f'<span style="font-size:13px;font-weight:400;color:#6B7280;margin-left:3px">{unit}</span>'
+        unit_html = f'<span style="font-size:15px;font-weight:400;color:#6B7280;margin-left:3px">{unit}</span>'
 
+    c = "var(--text-primary)" if color == "#111827" else color
     st.markdown(
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        f'<div style="font-size:11px;font-weight:600;letter-spacing:0.07em;'
-        f'text-transform:uppercase;color:#9CA3AF;margin-bottom:10px;'
+        f'<div style="font-size:13px;font-weight:600;letter-spacing:0.07em;'
+        f'text-transform:uppercase;color:var(--text-secondary);margin-bottom:10px;'
         f'overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{label}</div>'
-        f'<div style="font-size:26px;font-weight:700;color:{color};line-height:1.1">'
+        f'<div style="font-size:30px;font-weight:700;color:{c};line-height:1.1">'
         f'{value}{unit_html}</div>'
         f'{delta_html}'
         f'</div>',
@@ -166,14 +167,14 @@ def health_kpi_card(label: str, pct: float) -> None:
     bar_w = max(0, min(100, pct))
 
     st.markdown(
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        f'<div style="font-size:11px;font-weight:600;letter-spacing:0.07em;'
-        f'text-transform:uppercase;color:#9CA3AF;margin-bottom:10px">{label}</div>'
-        f'<div style="font-size:26px;font-weight:700;color:{col};line-height:1.1">'
+        f'<div style="font-size:13px;font-weight:600;letter-spacing:0.07em;'
+        f'text-transform:uppercase;color:var(--text-secondary);margin-bottom:10px">{label}</div>'
+        f'<div style="font-size:30px;font-weight:700;color:{col};line-height:1.1">'
         f'{pct:.0f}%</div>'
         f'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">'
-        f'<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;'
+        f'<span style="font-size:13px;font-weight:600;padding:2px 8px;border-radius:20px;'
         f'background:{stbg};color:{stcol}">{status}</span>'
         f'</div>'
         f'<div style="height:3px;border-radius:2px;background:#E5E7EB;margin-top:10px">'
@@ -196,14 +197,14 @@ def risk_kpi_card(label: str, risk: float) -> None:
     bar_w = max(0, min(100, risk))
 
     st.markdown(
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        f'<div style="font-size:11px;font-weight:600;letter-spacing:0.07em;'
-        f'text-transform:uppercase;color:#9CA3AF;margin-bottom:10px">{label}</div>'
-        f'<div style="font-size:26px;font-weight:700;color:{col};line-height:1.1">'
+        f'<div style="font-size:13px;font-weight:600;letter-spacing:0.07em;'
+        f'text-transform:uppercase;color:var(--text-secondary);margin-bottom:10px">{label}</div>'
+        f'<div style="font-size:30px;font-weight:700;color:{col};line-height:1.1">'
         f'{risk:.0f}%</div>'
         f'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">'
-        f'<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;'
+        f'<span style="font-size:13px;font-weight:600;padding:2px 8px;border-radius:20px;'
         f'background:{stbg};color:{stcol}">{status}</span>'
         f'</div>'
         f'<div style="height:3px;border-radius:2px;background:#E5E7EB;margin-top:10px">'
@@ -249,29 +250,39 @@ def gauge_card(value: float, title: str, invert: bool = False) -> None:
         paper_bgcolor="white", plot_bgcolor="white",
         font={"family": "Inter"},
     )
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
 
 
 # ── Alert Card ───────────────────────────────────────────────────
 def alert_card(title: str, detail: str, time_str: str, level: str = "info") -> None:
     lvl = level.lower()
-    if "critical" in lvl or "error" in lvl:
-        border, bg, col, dot = "#FECACA", "#FEF9F9", "#B91C1C", "#DC2626"
-    elif "warning" in lvl or "warn" in lvl:
-        border, bg, col, dot = "#FDE68A", "#FFFDF5", "#92400E", "#F59E0B"
-    elif "success" in lvl or "ok" in lvl:
-        border, bg, col, dot = "#BBF7D0", "#F9FFFE", "#15803D", "#16A34A"
+    if st.session_state.dark_mode:
+        if "critical" in lvl or "error" in lvl:
+            border, bg, col, dot = "#7F1D1D", "#450A0A", "#F87171", "#EF4444"
+        elif "warning" in lvl or "warn" in lvl:
+            border, bg, col, dot = "#78350F", "#451A03", "#FBBF24", "#F59E0B"
+        elif "success" in lvl or "ok" in lvl:
+            border, bg, col, dot = "#064E3B", "#022C22", "#34D399", "#10B981"
+        else:
+            border, bg, col, dot = "#1E293B", "#0F172A", "#F1F5F9", "#CBD5E1"
     else:
-        border, bg, col, dot = "#BFDBFE", "#F5F9FF", "#1D4ED8", "#2563EB"
+        if "critical" in lvl or "error" in lvl:
+            border, bg, col, dot = "#FECACA", "#FEF9F9", "#B91C1C", "#DC2626"
+        elif "warning" in lvl or "warn" in lvl:
+            border, bg, col, dot = "#FDE68A", "#FFFDF5", "#92400E", "#F59E0B"
+        elif "success" in lvl or "ok" in lvl:
+            border, bg, col, dot = "#BBF7D0", "#F9FFFE", "#15803D", "#16A34A"
+        else:
+            border, bg, col, dot = "#BFDBFE", "#F5F9FF", "#111827", "#111827"
 
     st.markdown(
         f'<div style="background:{bg};border:1px solid {border};border-left:3px solid {dot};'
         f'border-radius:8px;padding:12px 14px;margin-bottom:8px">'
         f'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
-        f'<div style="font-size:13px;font-weight:600;color:{col};margin-bottom:3px">{title}</div>'
-        f'<div style="font-size:11px;color:#9CA3AF;white-space:nowrap;margin-left:12px">{time_str}</div>'
+        f'<div style="font-size:15px;font-weight:600;color:{col};margin-bottom:3px">{title}</div>'
+        f'<div style="font-size:13px;color:var(--text-secondary);white-space:nowrap;margin-left:12px">{time_str}</div>'
         f'</div>'
-        f'<div style="font-size:12px;color:#6B7280;line-height:1.5">{detail}</div>'
+        f'<div style="font-size:14px;color:var(--text-secondary);line-height:1.5">{detail}</div>'
         f'</div>',
         unsafe_allow_html=True,
     )
@@ -285,21 +296,21 @@ def recommendation_card(action: str, priority: str, eta: str = "") -> None:
     elif "high" in pl:
         icon, col = "🟠", "#92400E"
     elif "medium" in pl:
-        icon, col = "🔵", "#1D4ED8"
+        icon, col = "🔵", "#111827"
     else:
         icon, col = "🟢", "#15803D"
 
     eta_html = ""
     if eta:
-        eta_html = f'<div style="font-size:11px;color:#9CA3AF;margin-top:4px">⏱ {eta}</div>'
+        eta_html = f'<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">⏱ {eta}</div>'
 
     st.markdown(
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:10px;'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;'
         f'padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">'
         f'<div style="display:flex;gap:10px;align-items:flex-start">'
-        f'<span style="font-size:16px;flex-shrink:0;margin-top:1px">{icon}</span>'
+        f'<span style="font-size:18px;flex-shrink:0;margin-top:1px">{icon}</span>'
         f'<div>'
-        f'<div style="font-size:13px;font-weight:500;color:#111827;line-height:1.4">{action}</div>'
+        f'<div style="font-size:15px;font-weight:500;color:var(--text-primary);line-height:1.4">{action}</div>'
         f'{eta_html}'
         f'</div></div>'
         f'</div>',
@@ -321,19 +332,19 @@ def risk_breakdown_bars(breakdown: dict[str, float]) -> None:
         rows.append(
             f'<div style="margin-bottom:14px">'
             f'<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
-            f'<span style="font-size:12px;color:#6B7280">{label}</span>'
-            f'<span style="font-size:12px;font-weight:600;color:{col}">{pct}</span>'
+            f'<span style="font-size:14px;color:var(--text-primary)">{label}</span>'
+            f'<span style="font-size:14px;font-weight:600;color:{col}">{pct}</span>'
             f'</div>'
-            f'<div style="height:4px;background:#F3F4F6;border-radius:2px">'
+            f'<div style="height:4px;background:var(--bg-secondary);border-radius:2px">'
             f'<div style="height:100%;width:{val:.0f}%;background:{col};'
             f'border-radius:2px;transition:width 0.4s ease"></div>'
             f'</div></div>'
         )
     st.markdown(
-        '<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        '<div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:16px">'
-        'RISK FACTOR BREAKDOWN</div>' + "".join(rows) + "</div>",
+        '<div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:16px;'
+        'letter-spacing:0.07em">RISK FACTOR BREAKDOWN</div>' + "".join(rows) + "</div>",
         unsafe_allow_html=True,
     )
 
@@ -342,40 +353,46 @@ def risk_breakdown_bars(breakdown: dict[str, float]) -> None:
 def ai_insight_card(machine_id: str, risk: float, message: str,
                     action: str, confidence: float = 88.0) -> None:
     risk_col = _risk_color(risk)
-    if risk >= 60:
-        border_col, bg_col = "#FECACA", "#FFFAFA"
-        icon = "⚠️"
-    elif risk >= 35:
-        border_col, bg_col = "#FDE68A", "#FFFEF5"
-        icon = "🔔"
+    if st.session_state.dark_mode:
+        if risk >= 60:
+            border_col, bg_col = "#7F1D1D", "#450A0A"
+        elif risk >= 35:
+            border_col, bg_col = "#78350F", "#451A03"
+        else:
+            border_col, bg_col = "#064E3B", "#022C22"
     else:
-        border_col, bg_col = "#BBF7D0", "#F7FFFA"
-        icon = "✅"
-
+        if risk >= 60:
+            border_col, bg_col = "#FECACA", "#FFFAFA"
+        elif risk >= 35:
+            border_col, bg_col = "#FDE68A", "#FFFEF5"
+        else:
+            border_col, bg_col = "#BBF7D0", "#F7FFFA"
+        
+    icon = "⚠️" if risk >= 60 else "🔔" if risk >= 35 else "✅"
     conf_bar = max(0, min(100, confidence))
 
     st.markdown(
         f'<div style="background:{bg_col};border:1px solid {border_col};'
         f'border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
         f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
-        f'<span style="font-size:18px">{icon}</span>'
-        f'<div style="font-size:11px;font-weight:600;letter-spacing:0.06em;'
+        f'<span style="font-size:20px">{icon}</span>'
+        f'<div style="font-size:13px;font-weight:600;letter-spacing:0.06em;'
         f'text-transform:uppercase;color:{risk_col}">AI INSIGHT</div>'
-        f'<span style="margin-left:auto;font-size:11px;font-weight:600;'
-        f'background:#F3F4F6;color:#374151;padding:2px 8px;border-radius:20px">'
+        f'<span style="margin-left:auto;font-size:13px;font-weight:600;'
+        f'background:var(--bg-secondary);color:var(--text-primary);padding:2px 8px;border-radius:20px">'
         f'Machine {machine_id}</span>'
         f'</div>'
-        f'<div style="font-size:13px;color:#374151;line-height:1.6;margin-bottom:14px">'
+        f'<div style="font-size:15px;color:var(--text-primary);line-height:1.6;margin-bottom:14px">'
         f'{message}</div>'
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;'
-        f'padding:10px 14px;font-size:12px;font-weight:500;color:#374151;margin-bottom:12px">'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;'
+        f'padding:10px 14px;font-size:14px;font-weight:500;color:var(--text-primary);margin-bottom:12px">'
         f'▶ {action}</div>'
         f'<div style="display:flex;justify-content:space-between;align-items:center">'
-        f'<span style="font-size:11px;color:#9CA3AF">Confidence</span>'
-        f'<span style="font-size:12px;font-weight:600;color:#374151">{confidence:.1f}%</span>'
+        f'<span style="font-size:13px;color:var(--text-secondary)">Confidence</span>'
+        f'<span style="font-size:14px;font-weight:600;color:var(--text-primary)">{confidence:.1f}%</span>'
         f'</div>'
-        f'<div style="height:3px;background:#E5E7EB;border-radius:2px;margin-top:6px">'
-        f'<div style="height:100%;width:{conf_bar:.0f}%;background:#2563EB;border-radius:2px"></div>'
+        f'<div style="height:3px;background:var(--border);border-radius:2px;margin-top:6px">'
+        f'<div style="height:100%;width:{conf_bar:.0f}%;background:var(--text-primary);border-radius:2px"></div>'
         f'</div></div>',
         unsafe_allow_html=True,
     )
@@ -401,7 +418,7 @@ def fusion_flow(
     status_badge_html = status_badge(status)
 
     steps = [
-        ("📡", "NASA Tool Wear Model",        f"VB = {vb:.4f} mm · RUL = {rul:.1f} min", "#2563EB"),
+        ("📡", "NASA Tool Wear Model",        f"VB = {vb:.4f} mm · RUL = {rul:.1f} min", "#111827"),
         ("🤖", "AI4I Failure Prediction",     f"Failure Prob = {fp:.1f}% · Type: {ft}",   "#7C3AED"),
         ("🔀", "Decision Fusion Engine",      f"Weighted risk fusion across both models",  "#0891B2"),
         ("📊", "Risk Assessment",             f"Overall Risk = {risk:.0f}% · {status_badge_html}", risk_col),
@@ -409,10 +426,10 @@ def fusion_flow(
     ]
 
     html = (
-        '<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         'padding:24px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        '<div style="font-size:12px;font-weight:600;letter-spacing:0.07em;'
-        'text-transform:uppercase;color:#9CA3AF;margin-bottom:20px">DECISION FUSION PIPELINE</div>'
+        '<div style="font-size:14px;font-weight:600;letter-spacing:0.07em;'
+        'text-transform:uppercase;color:var(--text-secondary);margin-bottom:20px">DECISION FUSION PIPELINE</div>'
     )
     for i, (icon, title, detail, col) in enumerate(steps):
         connector = ""
@@ -420,16 +437,18 @@ def fusion_flow(
             connector = (
                 '<div style="display:flex;justify-content:flex-start;padding-left:28px;'
                 'margin:0 0 4px 0">'
-                '<div style="width:2px;height:20px;background:#E5E7EB"></div></div>'
+                '<div style="width:2px;height:20px;background:var(--border)"></div></div>'
             )
+        bg_col = "var(--border)" if col == "#111827" else f"{col}18"
+        text_col = "var(--text-primary)" if col == "#111827" else col
         html += (
             f'<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:4px">'
-            f'<div style="width:36px;height:36px;border-radius:10px;background:{col}18;'
+            f'<div style="width:36px;height:36px;border-radius:10px;background:{bg_col};'
             f'display:flex;align-items:center;justify-content:center;flex-shrink:0;'
-            f'font-size:16px">{icon}</div>'
+            f'font-size:18px">{icon}</div>'
             f'<div style="padding-top:2px;flex:1;min-width:0">'
-            f'<div style="font-size:13px;font-weight:600;color:#111827">{title}</div>'
-            f'<div style="font-size:12px;color:#6B7280;margin-top:1px;line-height:1.4">'
+            f'<div style="font-size:15px;font-weight:600;color:var(--text-primary)">{title}</div>'
+            f'<div style="font-size:14px;color:var(--text-secondary);margin-top:1px;line-height:1.4">'
             f'{detail}</div></div></div>'
         ) + connector
     html += "</div>"
@@ -452,21 +471,21 @@ def shap_panel(breakdown: dict[str, float], title: str = "Feature Influence") ->
         dir_label = "+Risk" if val > 0 else "-Risk"
         rows.append(
             f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
-            f'<div style="width:130px;font-size:12px;color:#374151;'
+            f'<div style="width:130px;font-size:14px;color:var(--text-primary);'
             f'text-align:right;flex-shrink:0">{label}</div>'
-            f'<div style="flex:1;background:#F3F4F6;border-radius:3px;height:16px;'
+            f'<div style="flex:1;background:var(--bg-secondary);border-radius:3px;height:16px;'
             f'position:relative;overflow:hidden">'
             f'<div style="height:100%;width:{w:.0f}%;background:{col};'
             f'border-radius:3px;opacity:0.7"></div></div>'
-            f'<div style="width:50px;font-size:11px;font-weight:600;'
+            f'<div style="width:50px;font-size:13px;font-weight:600;'
             f'color:{col}">{dir_label}</div>'
             f'</div>'
         )
     st.markdown(
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         f'padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        f'<div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:16px">'
-        f'{title.upper()}</div>'
+        f'<div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:16px;'
+        f'letter-spacing:0.07em">{title.upper()}</div>'
         + "".join(rows) + "</div>",
         unsafe_allow_html=True,
     )
@@ -482,8 +501,13 @@ def digital_twin(components: dict[str, tuple[str, float]]) -> None:
     for i, (comp_name, (status_str, health_pct)) in enumerate(components.items()):
         col      = _health_color(health_pct)
         sl       = status_str.lower()
-        bg       = "#F0FDF4" if "healthy" in sl else "#FFFBEB" if "warning" in sl else "#FEF2F2"
-        border   = "#BBF7D0" if "healthy" in sl else "#FDE68A" if "warning" in sl else "#FECACA"
+        if st.session_state.dark_mode:
+            bg   = "#022C22" if "healthy" in sl else "#451A03" if "warning" in sl else "#450A0A"
+            border = "#064E3B" if "healthy" in sl else "#78350F" if "warning" in sl else "#7F1D1D"
+        else:
+            bg   = "#F0FDF4" if "healthy" in sl else "#FFFBEB" if "warning" in sl else "#FEF2F2"
+            border = "#BBF7D0" if "healthy" in sl else "#FDE68A" if "warning" in sl else "#FECACA"
+            
         icon     = icons.get(comp_name, "📦")
         bar_col  = col
         bar_w    = max(0, min(100, health_pct))
@@ -493,16 +517,16 @@ def digital_twin(components: dict[str, tuple[str, float]]) -> None:
                 f'<div style="background:{bg};border:1px solid {border};'
                 f'border-radius:12px;padding:18px 16px;text-align:center;'
                 f'box-shadow:0 1px 3px rgba(0,0,0,0.05)">'
-                f'<div style="font-size:24px;margin-bottom:8px">{icon}</div>'
-                f'<div style="font-size:12px;font-weight:600;color:#374151;'
+                f'<div style="font-size:28px;margin-bottom:8px">{icon}</div>'
+                f'<div style="font-size:14px;font-weight:600;color:var(--text-primary);'
                 f'margin-bottom:6px">{comp_name}</div>'
-                f'<div style="font-size:22px;font-weight:700;color:{col};'
+                f'<div style="font-size:26px;font-weight:700;color:{col};'
                 f'line-height:1">{health_pct:.0f}%</div>'
-                f'<div style="height:3px;background:#E5E7EB;border-radius:2px;margin:10px 0 8px">'
+                f'<div style="height:3px;background:var(--border);border-radius:2px;margin:10px 0 8px">'
                 f'<div style="height:100%;width:{bar_w:.0f}%;background:{bar_col};'
                 f'border-radius:2px"></div></div>'
-                f'<div style="font-size:10px;font-weight:600;padding:2px 8px;'
-                f'border-radius:20px;background:#FFFFFF;color:{col};'
+                f'<div style="font-size:12px;font-weight:600;padding:2px 8px;'
+                f'border-radius:20px;background:var(--bg-card);color:{col};'
                 f'display:inline-block">{status_str.title()}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
@@ -516,28 +540,28 @@ def machine_card(machine_id: str, status: str, tool_health: float,
     mh_col    = _health_color(machine_health)
     rk_col    = _risk_color(risk)
     last_html = (
-        f'<div style="font-size:11px;color:#9CA3AF;margin-top:8px">Last: {last_pred}</div>'
+        f'<div style="font-size:13px;color:var(--text-secondary);margin-top:8px">Last: {last_pred}</div>'
         if last_pred else ""
     )
     badge_html = status_badge(status)
 
     st.markdown(
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         f'padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:8px">'
         f'<div style="display:flex;justify-content:space-between;align-items:center;'
         f'margin-bottom:14px">'
-        f'<span style="font-size:14px;font-weight:600;color:#111827">{machine_id}</span>'
+        f'<span style="font-size:16px;font-weight:600;color:var(--text-primary)">{machine_id}</span>'
         f'{badge_html}</div>'
         f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">'
-        f'<div><div style="font-size:10px;color:#9CA3AF;text-transform:uppercase;'
+        f'<div><div style="font-size:12px;color:var(--text-secondary);text-transform:uppercase;'
         f'letter-spacing:0.05em;margin-bottom:4px">Tool</div>'
-        f'<div style="font-size:18px;font-weight:700;color:{th_col}">{tool_health:.0f}%</div></div>'
-        f'<div><div style="font-size:10px;color:#9CA3AF;text-transform:uppercase;'
+        f'<div style="font-size:20px;font-weight:700;color:{th_col}">{tool_health:.0f}%</div></div>'
+        f'<div><div style="font-size:12px;color:var(--text-secondary);text-transform:uppercase;'
         f'letter-spacing:0.05em;margin-bottom:4px">Machine</div>'
-        f'<div style="font-size:18px;font-weight:700;color:{mh_col}">{machine_health:.0f}%</div></div>'
-        f'<div><div style="font-size:10px;color:#9CA3AF;text-transform:uppercase;'
+        f'<div style="font-size:20px;font-weight:700;color:{mh_col}">{machine_health:.0f}%</div></div>'
+        f'<div><div style="font-size:12px;color:var(--text-secondary);text-transform:uppercase;'
         f'letter-spacing:0.05em;margin-bottom:4px">Risk</div>'
-        f'<div style="font-size:18px;font-weight:700;color:{rk_col}">{risk:.0f}%</div></div>'
+        f'<div style="font-size:20px;font-weight:700;color:{rk_col}">{risk:.0f}%</div></div>'
         f'</div>{last_html}</div>',
         unsafe_allow_html=True,
     )
@@ -546,13 +570,13 @@ def machine_card(machine_id: str, status: str, tool_health: float,
 # ── Panel helpers ─────────────────────────────────────────────────
 def panel(title: str, subtitle: str = "") -> str:
     sub = (
-        f'<div style="font-size:12px;color:#9CA3AF;margin-top:2px">{subtitle}</div>'
+        f'<div style="font-size:14px;color:var(--text-secondary);margin-top:2px">{subtitle}</div>'
         if subtitle else ""
     )
     return (
-        '<div style="background:#FFFFFF;border:1px solid #E5E7EB;'
+        '<div style="background:var(--bg-card);border:1px solid var(--border);'
         'border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
-        f'<div style="font-size:14px;font-weight:600;color:#111827;'
+        f'<div style="font-size:16px;font-weight:600;color:var(--text-primary);'
         f'margin-bottom:16px">{title}{sub}</div>'
     )
 

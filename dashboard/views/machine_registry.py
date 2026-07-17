@@ -89,9 +89,12 @@ def render() -> None:
     section_title("Register New Machine")
     with st.expander("+ Add Machine to Fleet", expanded=(total == 0)):
         if not can_register:
+            bg_reg = "#451A03" if st.session_state.dark_mode else "#FFF7ED"
+            border_reg = "#78350F" if st.session_state.dark_mode else "#FED7AA"
+            text_reg = "#FBBF24" if st.session_state.dark_mode else "#92400E"
             st.markdown(
-                '<div style="background:#FFF7ED;border:1px solid #FED7AA;'
-                'border-radius:8px;padding:10px 14px;font-size:13px;color:#92400E">'
+                f'<div style="background:{bg_reg};border:1px solid {border_reg};'
+                f'border-radius:8px;padding:10px 14px;font-size:13px;color:{text_reg}">'
                 'Your role does not permit registering new machines.</div>',
                 unsafe_allow_html=True,
             )
@@ -117,7 +120,7 @@ def render() -> None:
 
                 spacer(4)
                 submitted = st.form_submit_button(
-                    "Register Machine", type="primary", use_container_width=True
+                    "Register Machine", type="primary", width='stretch'
                 )
 
             if submitted:
@@ -147,10 +150,10 @@ def render() -> None:
 
     if not machines:
         st.markdown(
-            '<div style="background:#F8FAFC;border:1px solid #E2E8F0;'
-            'border-radius:12px;padding:40px;text-align:center;color:#94A3B8">'
+            '<div style="background:var(--bg-card);border:1px solid var(--border);'
+            'border-radius:12px;padding:40px;text-align:center;color:var(--text-secondary)">'
             '<div style="font-size:32px;margin-bottom:8px">🏭</div>'
-            '<div style="font-size:15px;font-weight:600;color:#64748B">'
+            '<div style="font-size:15px;font-weight:600;color:var(--text-secondary)">'
             'No machines registered yet</div>'
             '<div style="font-size:13px;margin-top:4px">'
             'Use the form above to add your first machine.</div>'
@@ -166,9 +169,9 @@ def render() -> None:
         ["Machine ID", "Name", "Type", "Material", "Factory", "Status", "Actions"],
     ):
         col.markdown(
-            f'<div style="font-size:11px;font-weight:700;color:#6B7280;'
+            f'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);'
             f'text-transform:uppercase;letter-spacing:.06em;padding:6px 0;'
-            f'border-bottom:1px solid #E2E8F0">{lbl}</div>',
+            f'border-bottom:1px solid var(--border)">{lbl}</div>',
             unsafe_allow_html=True,
         )
 
@@ -188,23 +191,23 @@ def render() -> None:
         col1, col2, col3, col4, col5, col6, col7 = st.columns([1.2, 2, 1.4, 1.2, 1.2, 1.2, 1.6])
 
         col1.markdown(
-            f'<div style="font-size:13px;font-weight:700;color:#0F172A;padding:10px 0">{mid}</div>',
+            f'<div style="font-size:13px;font-weight:700;color:var(--text-primary);padding:10px 0">{mid}</div>',
             unsafe_allow_html=True,
         )
         col2.markdown(
-            f'<div style="font-size:13px;color:#374151;padding:10px 0">{mname}</div>',
+            f'<div style="font-size:13px;color:var(--text-primary);padding:10px 0">{mname}</div>',
             unsafe_allow_html=True,
         )
         col3.markdown(
-            f'<div style="font-size:12px;color:#6B7280;padding:10px 0">{mtype}</div>',
+            f'<div style="font-size:12px;color:var(--text-secondary);padding:10px 0">{mtype}</div>',
             unsafe_allow_html=True,
         )
         col4.markdown(
-            f'<div style="font-size:12px;color:#6B7280;padding:10px 0">{mat}</div>',
+            f'<div style="font-size:12px;color:var(--text-secondary);padding:10px 0">{mat}</div>',
             unsafe_allow_html=True,
         )
         col5.markdown(
-            f'<div style="font-size:12px;color:#6B7280;padding:10px 0">{fac or "—"}</div>',
+            f'<div style="font-size:12px;color:var(--text-secondary);padding:10px 0">{fac or "—"}</div>',
             unsafe_allow_html=True,
         )
 
@@ -305,6 +308,6 @@ def render() -> None:
                     st.rerun()
 
         st.markdown(
-            '<div style="border-bottom:1px solid #F1F5F9;margin:2px 0"></div>',
+            '<div style="border-bottom:1px solid var(--border);margin:2px 0"></div>',
             unsafe_allow_html=True,
         )

@@ -9,10 +9,70 @@ def render() -> None:
     st.markdown("""
     <style>
     [data-testid="stAppViewContainer"] {
-        background: linear-gradient(135deg, #0d1b2e 0%, #1a3154 50%, #0d1b2e 100%) !important;
+        background: linear-gradient(160deg,#0E1A2E 0%,#1B3050 60%,#162644 100%) !important;
     }
     .block-container { padding: 2rem 1rem !important; }
     [data-testid="stSidebar"] { display: none !important; }
+
+    /* Wrap the register form in a white card look */
+    [data-testid="stForm"] {
+      background:    rgba(255,255,255,0.98) !important;
+      border-radius: 20px !important;
+      padding:       28px 32px 28px !important;
+      box-shadow:    0 24px 64px rgba(0,0,0,0.40), 0 4px 16px rgba(0,0,0,0.12) !important;
+      border:        1px solid rgba(255,255,255,0.70) !important;
+    }
+
+    /* Labels inside card */
+    [data-testid="stForm"] label,
+    [data-testid="stForm"] label p,
+    [data-testid="stForm"] [data-testid="stWidgetLabel"] p {
+      color: #1F2937 !important;
+      font-size: 13px !important;
+      font-weight: 600 !important;
+    }
+
+    /* Inputs inside card */
+    .stTextInput input, .stSelectbox [data-baseweb="select"] {
+      height:        42px    !important;
+      border-radius: 8px     !important;
+      border-color:  #D1D5DB !important;
+      font-size:     14px    !important;
+      color:         #111827 !important;
+      background:    #FFFFFF !important;
+    }
+
+    /* Form primary button */
+    .stFormSubmitButton > button {
+      background:    #2563EB !important;
+      border-color:  #2563EB !important;
+      color:         #FFFFFF !important;
+      font-size:     14px   !important;
+      font-weight:   600    !important;
+      border-radius: 8px    !important;
+      height:        46px   !important;
+      width:         100% !important;
+      box-shadow:    0 3px 12px rgba(37,99,235,0.25) !important;
+    }
+    .stFormSubmitButton > button:hover {
+      background:  #1D4ED8 !important;
+      box-shadow:  0 5px 20px rgba(37,99,235,0.35) !important;
+    }
+
+    /* Secondary buttons outside card */
+    [data-testid="column"]:nth-child(2) .stButton > button {
+      background:    transparent !important;
+      border:        1px solid #4B5563 !important;
+      color:         #CBD5E1 !important;
+      border-radius: 8px !important;
+      height:        40px  !important;
+      width:         100% !important;
+    }
+    [data-testid="column"]:nth-child(2) .stButton > button:hover {
+      background:   rgba(255,255,255,0.1) !important;
+      border-color: #FFFFFF !important;
+      color:        #FFFFFF !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -23,11 +83,11 @@ def render() -> None:
         st.markdown("""
         <div style="text-align:center;margin-bottom:24px">
           <div style="display:inline-flex;align-items:center;justify-content:center;
-               width:48px;height:48px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);
-               border-radius:12px;box-shadow:0 4px 16px rgba(29,78,216,0.40);margin-bottom:12px">
+               width:48px;height:48px;background:linear-gradient(135deg,#111827,#2563EB);
+               border-radius:12px;box-shadow:0 4px 16px rgba(29,78,216,0.30);margin-bottom:12px">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                 stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
           <div style="font-size:1.4rem;font-weight:800;color:#f1f5f9;letter-spacing:-.02em">
@@ -35,13 +95,6 @@ def render() -> None:
           <div style="font-size:0.76rem;color:#94a3b8;margin-top:3px">
             Join IndustrialMaint AI Platform</div>
         </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div style="background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);
-             border-radius:20px;padding:32px 36px;
-             box-shadow:0 20px 60px rgba(0,0,0,0.35);
-             border:1px solid rgba(255,255,255,0.6)">
         """, unsafe_allow_html=True)
 
         err = auth.get_auth_error()
@@ -93,7 +146,7 @@ def render() -> None:
 
             st.markdown('<div style="height:4px"></div>', unsafe_allow_html=True)
             submitted = st.form_submit_button(
-                "Create Account →", use_container_width=True, type="primary"
+                "Create Account →", width='stretch', type="primary"
             )
 
         if submitted:
@@ -112,14 +165,12 @@ def render() -> None:
                         st.rerun()
 
         st.markdown("""
-        <div style="text-align:center;margin-top:16px;font-size:0.78rem;color:#64748b">
+        <div style="text-align:center;margin-top:16px;font-size:0.78rem;color:#CBD5E1">
           Already have an account?
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("← Back to Sign In", use_container_width=True, key="go_login"):
+        if st.button("← Back to Sign In", width='stretch', key="go_login"):
             st.session_state.auth_page = "login"
             st.session_state.pop("auth_error", None)
             st.rerun()
-
-        st.markdown("</div>", unsafe_allow_html=True)

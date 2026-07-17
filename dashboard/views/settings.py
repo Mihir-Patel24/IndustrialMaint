@@ -9,15 +9,15 @@ from components import kpi_card, spacer, section_title
 from auth.auth_service import auth
 from auth.rbac        import has_permission, role_badge_html
 
-_SLATE  = "#1e293b"
-_GRAY   = "#64748b"
-_LGRAY  = "#94a3b8"
-_BORDER = "#e2e8f0"
-_WHITE  = "#ffffff"
+_SLATE  = "var(--text-primary)"
+_GRAY   = "var(--text-secondary)"
+_LGRAY  = "var(--text-secondary)"
+_BORDER = "var(--border)"
+_WHITE  = "var(--bg-card)"
 _GREEN  = "#16a34a"
 _AMBER  = "#d97706"
 _RED    = "#dc2626"
-_BLUE   = "#2563eb"
+_BLUE   = "var(--text-primary)"
 
 
 def _section(title: str) -> None:
@@ -38,16 +38,19 @@ def render():
     st.markdown(
         f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
         f'{role_badge_html(role)}'
-        f'<span style="font-size:12px;color:#6B7280">'
+        f'<span style="font-size:12px;color:var(--text-secondary)">'
         f'{"Full settings access" if can_edit else "Read-only access — contact Plant Manager or Admin to modify settings."}'
         f'</span></div>',
         unsafe_allow_html=True,
     )
 
     if not can_edit:
+        bg_ro = "#451A03" if st.session_state.dark_mode else "#FFF7ED"
+        border_ro = "#78350F" if st.session_state.dark_mode else "#FED7AA"
+        text_ro = "#FBBF24" if st.session_state.dark_mode else "#92400E"
         st.markdown(
-            '<div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;'
-            'padding:12px 16px;margin-bottom:20px;font-size:13px;color:#92400E">'
+            f'<div style="background:{bg_ro};border:1px solid {border_ro};border-radius:10px;'
+            f'padding:12px 16px;margin-bottom:20px;font-size:13px;color:{text_ro}">'
             '<b>Read-Only Mode.</b> Your role (<b>Operator</b>) can view but not modify '
             'system settings. Contact your Plant Manager or Admin for changes.</div>',
             unsafe_allow_html=True,
@@ -86,7 +89,7 @@ def render():
 
         # Visual threshold summary
         st.markdown(
-            f'<div style="background:#f8fafc;border-radius:6px;padding:10px 14px;margin-top:12px;'
+            f'<div style="background:var(--bg-secondary);border-radius:6px;padding:10px 14px;margin-top:12px;'
             f'display:flex;gap:16px;font-size:0.74rem;color:{_GRAY}">'
             f'<span>Wear: <b style="color:{_SLATE}">{cfg["wear_threshold"]:.2f} mm</b></span>'
             f'<span>Risk: <b style="color:{_SLATE}">{cfg["risk_threshold"]}%</b></span>'
@@ -96,7 +99,7 @@ def render():
         )
 
         spacer(12)
-        if st.button("Save Thresholds", key="s_save_thresh", type="primary", use_container_width=True):
+        if st.button("Save Thresholds", key="s_save_thresh", type="primary", width='stretch'):
             st.session_state.settings = cfg
             st.success("Thresholds saved.")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -123,7 +126,7 @@ def render():
             key="s_email_addr",
         )
         spacer(12)
-        if st.button("Save Notification Settings", key="s_save_notif", type="primary", use_container_width=True):
+        if st.button("Save Notification Settings", key="s_save_notif", type="primary", width='stretch'):
             st.session_state.settings = cfg
             st.success("Notification settings saved.")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -153,7 +156,7 @@ def render():
 
         # Model version info
         st.markdown(
-            f'<div style="background:#f8fafc;border-radius:6px;padding:12px 14px">'
+            f'<div style="background:var(--bg-secondary);border-radius:6px;padding:12px 14px">'
             f'<div style="font-size:0.74rem;font-weight:600;color:{_GRAY};margin-bottom:8px">ACTIVE MODEL VERSIONS</div>'
             f'<div style="display:flex;flex-direction:column;gap:6px">',
             unsafe_allow_html=True,
@@ -173,7 +176,7 @@ def render():
         st.markdown("</div></div>", unsafe_allow_html=True)
 
         spacer(12)
-        if st.button("Apply Model Settings", key="s_save_model", type="primary", use_container_width=True):
+        if st.button("Apply Model Settings", key="s_save_model", type="primary", width='stretch'):
             st.success("Model settings applied.")
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -203,7 +206,7 @@ def render():
         st.number_input("Prediction History (sessions)", value=50, min_value=10, max_value=500, key="s_hist")
         st.number_input("Alert Retention (days)", value=30, min_value=1, max_value=365, key="s_alert_ret")
         spacer(12)
-        if st.button("Save Display Settings", key="s_save_disp", type="primary", use_container_width=True):
+        if st.button("Save Display Settings", key="s_save_disp", type="primary", width='stretch'):
             st.session_state.settings = cfg
             st.success("Display settings saved.")
         st.markdown("</div>", unsafe_allow_html=True)

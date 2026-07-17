@@ -36,7 +36,7 @@ _WHITE  = "#ffffff"
 _GREEN  = "#16a34a"
 _AMBER  = "#d97706"
 _RED    = "#dc2626"
-_BLUE   = "#2563eb"
+_BLUE   = "#111827"
 
 _STATUS_COLORS = {
     "Critical": _RED, "Warning": _AMBER,
@@ -325,7 +325,7 @@ def render():
 
     with col_tbl:
         section_title(f"Prediction History  ({len(df)} records)")
-        st.dataframe(df, use_container_width=True, hide_index=True, height=320)
+        st.dataframe(df, width='stretch', hide_index=True, height=320)
 
     with col_dl:
         section_title("Export")
@@ -342,7 +342,7 @@ def render():
         st.download_button(
             "📥 Download CSV (filtered)",
             csv_bytes, f"predictions_{ts_str}.csv", "text/csv",
-            use_container_width=True, key="dl_csv",
+            width='stretch', key="dl_csv",
         )
         spacer(6)
 
@@ -353,7 +353,7 @@ def render():
                 "📦 Batch Export — All Predictions",
                 all_df.to_csv(index=False).encode("utf-8"),
                 f"all_predictions_{ts_str}.csv", "text/csv",
-                use_container_width=True, key="dl_batch",
+                width='stretch', key="dl_batch",
             )
             spacer(6)
 
@@ -363,7 +363,7 @@ def render():
             "📄 Download Report (TXT)",
             txt_report.encode("utf-8"),
             f"report_{ts_str}.txt", "text/plain",
-            use_container_width=True, key="dl_txt",
+            width='stretch', key="dl_txt",
         )
         spacer(6)
 
@@ -377,7 +377,7 @@ def render():
                 pdf_bytes,
                 f"report_{ts_str}.{ext}",
                 "application/pdf" if ext == "pdf" else "text/plain",
-                use_container_width=True, key="dl_pdf",
+                width='stretch', key="dl_pdf",
             )
 
         # Full test-set CSV
@@ -392,7 +392,7 @@ def render():
                 "📊 Full Test-Set CSV",
                 df_hist.to_csv(index=False).encode("utf-8"),
                 "predictions_enhanced.csv", "text/csv",
-                use_container_width=True, key="dl_hist",
+                width='stretch', key="dl_hist",
             )
 
         st.markdown("</div>", unsafe_allow_html=True)
@@ -406,52 +406,52 @@ def render():
 
         with ch1:
             st.markdown(
-                '<div style="background:#fff;border:1px solid #E2E8F0;'
+                '<div style="background:var(--bg-card);border:1px solid var(--border);'
                 'border-radius:10px;padding:14px 16px;margin-bottom:14px">'
-                '<div style="font-size:12px;font-weight:700;color:#64748B;'
+                '<div style="font-size:12px;font-weight:700;color:var(--text-secondary);'
                 'text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'
                 'Failure Risk Trend</div>',
                 unsafe_allow_html=True,
             )
-            st.plotly_chart(_chart_risk_trend(df), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_chart_risk_trend(df), width='stretch', config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
 
         with ch2:
             st.markdown(
-                '<div style="background:#fff;border:1px solid #E2E8F0;'
+                '<div style="background:var(--bg-card);border:1px solid var(--border);'
                 'border-radius:10px;padding:14px 16px;margin-bottom:14px">'
-                '<div style="font-size:12px;font-weight:700;color:#64748B;'
+                '<div style="font-size:12px;font-weight:700;color:var(--text-secondary);'
                 'text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'
                 'Tool & Machine Health Trend</div>',
                 unsafe_allow_html=True,
             )
-            st.plotly_chart(_chart_health_trend(df), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_chart_health_trend(df), width='stretch', config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
 
         ch3, ch4 = st.columns(2)
 
         with ch3:
             st.markdown(
-                '<div style="background:#fff;border:1px solid #E2E8F0;'
+                '<div style="background:var(--bg-card);border:1px solid var(--border);'
                 'border-radius:10px;padding:14px 16px">'
-                '<div style="font-size:12px;font-weight:700;color:#64748B;'
+                '<div style="font-size:12px;font-weight:700;color:var(--text-secondary);'
                 'text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'
                 'Machine Status Distribution</div>',
                 unsafe_allow_html=True,
             )
-            st.plotly_chart(_chart_status_dist(df), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_chart_status_dist(df), width='stretch', config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
 
         with ch4:
             st.markdown(
-                '<div style="background:#fff;border:1px solid #E2E8F0;'
+                '<div style="background:var(--bg-card);border:1px solid var(--border);'
                 'border-radius:10px;padding:14px 16px">'
-                '<div style="font-size:12px;font-weight:700;color:#64748B;'
+                '<div style="font-size:12px;font-weight:700;color:var(--text-secondary);'
                 'text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'
                 'Failure Type Breakdown</div>',
                 unsafe_allow_html=True,
             )
-            st.plotly_chart(_chart_failure_bar(df), use_container_width=True, config={"displayModeBar": False})
+            st.plotly_chart(_chart_failure_bar(df), width='stretch', config={"displayModeBar": False})
             st.markdown("</div>", unsafe_allow_html=True)
 
         spacer(20)
@@ -479,7 +479,7 @@ def render():
     with sg3:
         spacer(22)
         gen_btn = st.button("Generate Summary Report", type="primary",
-                            use_container_width=True, key="rpt_gen_btn")
+                            width='stretch', key="rpt_gen_btn")
 
     if gen_btn:
         # Filter DB predictions by chosen period
@@ -510,7 +510,7 @@ def render():
                     summary_bytes,
                     f"summary_{period_choice.replace(' ', '_')}_{ts_str}.{ext}",
                     mime,
-                    use_container_width=True,
+                    width='stretch',
                     key="dl_summary",
                 )
                 st.success(f"✅ Summary report generated — {len(period_preds)} predictions included.")
@@ -529,7 +529,7 @@ def render():
         section_title("Full Dataset Preview")
         st.dataframe(
             pd.read_csv(csv_path).head(50),
-            use_container_width=True, hide_index=True, height=280,
+            width='stretch', hide_index=True, height=280,
         )
         spacer(16)
 

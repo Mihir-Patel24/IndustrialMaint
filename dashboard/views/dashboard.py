@@ -53,15 +53,15 @@ def _trend_card(title: str, value: str, data: list, color: str) -> None:
         showlegend=False,
     )
     st.markdown(
-        f'<div style="background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;'
+        f'<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;'
         f'padding:16px 18px 8px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">'
         f'<div style="font-size:11px;font-weight:600;letter-spacing:0.07em;'
-        f'text-transform:uppercase;color:#9CA3AF;margin-bottom:6px">{title}</div>'
+        f'text-transform:uppercase;color:var(--text-secondary);margin-bottom:6px">{title}</div>'
         f'<div style="font-size:22px;font-weight:700;color:{color};line-height:1">'
         f'{value}</div></div>',
         unsafe_allow_html=True,
     )
-    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+    st.plotly_chart(fig, width='stretch', config={"displayModeBar": False})
 
 
 def render() -> None:
