@@ -1,4 +1,4 @@
-# Hybrid AI-Based Predictive Maintenance Framework for Smart Manufacturing
+# IndustrialMaint--Hybrid AI-Based Predictive Maintenance Framework for Smart Manufacturing
 
 <div align="center">
 
